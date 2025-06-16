@@ -6,6 +6,8 @@ from app.core.paths import TOOLS_LINUX_NMAP_PATH
 from app.models.host_config import Host
 
 
+# No longer needed.
+# Kept here just in case.
 async def discover_hosts(ips: List[str]) -> List[Host]:
     """
     Runs nmap -sn (host discovery) for the given list of targets.
@@ -39,6 +41,7 @@ async def discover_hosts(ips: List[str]) -> List[Host]:
                 ip = parts[1]
                 alive = True if "Status: Up" in line else False
                 all_hosts.append(Host(ip_address=ip, is_alive=alive))
+                logger.info(f"{ip} is alive.")
 
     except Exception as e:
         logger.error(f"Error running Nmap: {e}")

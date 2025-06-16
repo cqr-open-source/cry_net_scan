@@ -1,13 +1,16 @@
 import ipaddress
 import logging
+import socket
 from typing import List
 
 
 async def parse_targets(raw_targets: List[str]) -> List[str]:
     # List[Union[ipaddress.IPv4Address, ipaddress.IPv6Address, ipaddress.IPv4Network, ipaddress.IPv6Network]]:
     """
-    Parses a list of raw target strings into ipaddress objects.
-    Supports single IPs, CIDR ranges, and IP ranges (e.g., 192.168.1.1-192.168.1.10).
+    Parses a list of raw target strings into ipaddress objects,
+    or resolves domain names/URLs to IP addresses.
+    Supports single IPs, CIDR ranges, IP ranges (e.g., 192.168.1.1-192.168.1.10),
+    and domain names/URLs.
     """
     logger = logging.getLogger(__name__)
 
@@ -37,14 +40,13 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
                     result.append(str(current))
                     current = int(current) + 1
                     current = ipaddress.ip_address(current)
-                logger.info(f"Added {len(result)} IPs from range {target}")
                 continue
             except ValueError as e:
                 logger.error(f"Failed to parse range {target}: {e}")
                 raise e
 
         # Try to parse as CIDR (e.g., "192.168.1.0/24" or "2001:db8::/64")
-        if "/" in target:
+        if "/" in target and "//" not in target:
             try:
                 network = ipaddress.ip_network(target, strict=False)
                 logger.info(f"Parsing CIDR: {target}")
@@ -61,7 +63,37 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
 
             except ValueError as e:
                 logger.error(f"Failed to parse CIDR {target}: {e}")
-                raise e
+                continue
+
+        # Try to resolve as a domain or URL
+        # Simple check for potential domain/URL (lacks space, has a dot, or starts with http/https)
+        if " " not in target and (
+            "." in target
+            or target.startswith("http://")
+            or target.startswith("https://")
+        ):
+            try:
+                # Extract hostname if it's a URL
+                hostname = target
+                if target.startswith("http://"):
+                    hostname = target[len("http://") :]
+                elif target.startswith("https://"):
+                    hostname = target[len("https://") :]
+
+                # Remove path and query parameters if present
+                if "/" in hostname:
+                    hostname = hostname.split("/")[0]
+                if "?" in hostname:
+                    hostname = hostname.split("?")[0]
+
+                ip_address = socket.gethostbyname(hostname)
+                logger.info(f"Resolved {hostname} to IP: {ip_address}")
+                result.append(ip_address)
+                continue
+            except socket.gaierror as e:
+                logger.warning(f"Could not resolve domain/URL {target}: {e}")
+            except ValueError as e:
+                logger.error(f"Error processing URL/domain {target}: {e}")
 
         # Try to parse as single IP (e.g., "192.168.1.1" or "2001:db8::1")
         try:
@@ -70,8 +102,8 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
             result.append(str(ip))
             continue
         except ValueError as e:
-            logger.error(f"Failed to parse IP {target}: {e}")
-            raise e
+            logger.error(f"Failed to parse IP {target}: {e}. Skipping.")
+            continue
 
-    logger.info(f"Total IPs parsed: {len(result)}")
+    logger.info(f"Total IPs added: {len(result)}")
     return result

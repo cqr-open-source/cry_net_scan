@@ -1,6 +1,8 @@
-from typing import List  # , Optional, Dict, Any
+from typing import List
 
 from pydantic import BaseModel, Field
+
+from app.models.port_config import PortInfo
 
 
 class Host(BaseModel):
@@ -15,9 +17,10 @@ class Host(BaseModel):
     )
     # status: str = Field(..., description="The status of the host.")
 
-    # --- Basic Port/Service Information (from RustScan/Nmap) ---
-    ports: List[int] | None = Field(
-        [], description="List of open TCP ports found on the host."
+    # --- Basic Port/Service Information ---
+    # ports: List[int] = Field(default_factory=list, description="List of open TCP ports found on the host.")
+    ports: List[PortInfo] = Field(
+        default_factory=list, description="List of open TCP ports found on the host."
     )
 
     # TODO: fields must be not required!

@@ -39,8 +39,8 @@ async def init_args() -> argparse.Namespace:
         "target",
         nargs="+",  # Allows one or more targets
         type=str,
-        help="One or more target specifications: IP v4, IP v4 Range, IP v4 CIDR; IP v6, IP v6 Range, IP v6 CIDR\n"
-        "  (e.g., 192.168.1.1, 10.0.0.0/24, 172.16.0.1-172.16.0.255).",
+        help="One or more target specifications: domain, url, IP v4, IP v4 Range, IP v4 CIDR; IP v6, IP v6 Range, IP v6 CIDR\n"
+        "  (e.g., example.com, https://www.example.com, 192.168.1.1, 10.0.0.0/24, 172.16.0.1-172.16.0.255).",
     )
 
     # --- AI Features Configuration ---
