@@ -18,6 +18,8 @@ TOOLS_LINUX_NUCLEI_PATH = TOOLS_LINUX_PATH.joinpath("nuclei", "nuclei")
 TOOLS_WINDOWS_PATH = TOOLS_PATH.joinpath("windows")
 TOOLS_MACOS_PATH = TOOLS_PATH.joinpath("macos")
 
+NUCLEI_HOSTS_PATH = ROOT_PATH.joinpath("hosts.txt")
+
 LOG_PATH = ROOT_PATH.joinpath("logs")
 LOG_FILE_PATH = LOG_PATH.joinpath(
     f"{APP_NAME_SNAKE_CASE}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"

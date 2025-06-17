@@ -2,10 +2,11 @@ import argparse
 import logging
 from pathlib import Path
 
+from app.core.args import init_args
 from app.core.constants import APP_NAME
-from app.core.init_args import init_args
 from app.core.paths import REPORT_PATH
-from app.core.run_tool import run_tool
+from app.core.runner import run_tool
+from app.models.host_config import Host
 from app.models.scan_config import ScanConfig
 from app.utils.logging_utils import setup_logging
 from app.utils.system_utils import get_raw_cli_args, is_frozen
@@ -65,6 +66,6 @@ async def main():
     else:
         logger.info("Running in CLI mode (default).")
 
-        await run_tool(scan_config=scan_config)
+        all_hosts: set[Host] = await run_tool(scan_config=scan_config)  # noqa: F841
 
     logger.info(f"{APP_NAME} finished.")

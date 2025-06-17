@@ -11,14 +11,14 @@ class Host(BaseModel):
     This model will accumulate all information about the host throughout different scan phases.
     """
 
+    target: str = Field(..., description="Provided target.")
     ip_address: str = Field(..., description="The IP address of the host.")
     is_alive: bool = Field(
-        False, description="True if the host was found to be alive during discovery."
+        default=False,
+        description="True if the host was found to be alive during discovery.",
     )
-    # status: str = Field(..., description="The status of the host.")
 
     # --- Basic Port/Service Information ---
-    # ports: List[int] = Field(default_factory=list, description="List of open TCP ports found on the host.")
     ports: List[PortInfo] = Field(
         default_factory=list, description="List of open TCP ports found on the host."
     )
@@ -54,3 +54,7 @@ class Host(BaseModel):
     # # --- Other metadata ---
     # mac_address: Optional[str] = Field(None, description="MAC address if discovered (primarily for local networks).")
     # # Add other fields as needed, e.g., os_detection, hostname, etc.
+
+    # Need hash for set
+    def __hash__(self):
+        return hash((self.target, self.ip_address))

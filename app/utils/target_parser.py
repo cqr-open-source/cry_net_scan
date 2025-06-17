@@ -3,8 +3,10 @@ import logging
 import socket
 from typing import List
 
+from app.models.host_config import Host
 
-async def parse_targets(raw_targets: List[str]) -> List[str]:
+
+async def parse_targets(raw_targets: List[str]) -> set[Host]:
     # List[Union[ipaddress.IPv4Address, ipaddress.IPv6Address, ipaddress.IPv4Network, ipaddress.IPv6Network]]:
     """
     Parses a list of raw target strings into ipaddress objects,
@@ -14,14 +16,14 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
     """
     logger = logging.getLogger(__name__)
 
-    result = []
+    hosts = set()
 
     for target in raw_targets:
         target = target.strip()
         logger.info(f"Processing target: {target}")
 
         # Try to parse as IP range (e.g., "192.168.1.1 - 192.168.1.255")
-        if "-" in target:
+        if "-" in target and not target.startswith("http"):
             try:
                 start_ip, end_ip = [ip.strip() for ip in target.split("-")]
                 start = ipaddress.ip_address(start_ip)
@@ -37,9 +39,10 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
                 logger.info(f"Parsing range: {start_ip} - {end_ip}")
                 current = start
                 while current <= end:
-                    result.append(str(current))
+                    hosts.add(Host(target=target, ip_address=str(current)))
                     current = int(current) + 1
                     current = ipaddress.ip_address(current)
+
                 continue
             except ValueError as e:
                 logger.error(f"Failed to parse range {target}: {e}")
@@ -53,12 +56,10 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
                 for ip in network:
                     # Added limit for CIDR.
                     # TODO: find better decision
-                    if len(result) > 9:
-                        logger.warning(
-                            f"Too many IPs! Finishing appending it on IP: {ip}"
-                        )
+                    if len(hosts) > 9:
+                        logger.warning(f"Too many IPs! Finishing adding it on IP: {ip}")
                         break
-                    result.append(str(ip))
+                    hosts.add(Host(target=target, ip_address=str(ip)))
                 continue
 
             except ValueError as e:
@@ -88,7 +89,7 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
 
                 ip_address = socket.gethostbyname(hostname)
                 logger.info(f"Resolved {hostname} to IP: {ip_address}")
-                result.append(ip_address)
+                hosts.add(Host(target=target, ip_address=ip_address))
                 continue
             except socket.gaierror as e:
                 logger.warning(f"Could not resolve domain/URL {target}: {e}")
@@ -99,11 +100,11 @@ async def parse_targets(raw_targets: List[str]) -> List[str]:
         try:
             ip = ipaddress.ip_address(target)
             logger.info(f"Parsed single IP: {target}")
-            result.append(str(ip))
+            hosts.add(Host(target=target, ip_address=str(ip)))
             continue
         except ValueError as e:
             logger.error(f"Failed to parse IP {target}: {e}. Skipping.")
             continue
 
-    logger.info(f"Total IPs added: {len(result)}")
-    return result
+    logger.info(f"Total IPs added: {len(hosts)}")
+    return hosts
