@@ -1,11 +1,12 @@
 import logging
 import re
+from typing import List
 
 from app.models.host_config import Host
-from app.models.port_config import PortInfo
+from app.models.port_config import Port
 
 
-async def parse_rustscan(stdout: str, all_hosts: set[Host]) -> None:
+async def parse_rustscan(stdout: str, all_hosts: List[Host]) -> None:
     logger = logging.getLogger(__name__)
 
     # Regex patterns
@@ -20,7 +21,6 @@ async def parse_rustscan(stdout: str, all_hosts: set[Host]) -> None:
 
     for line in stdout.split("\n"):
         line = line.strip()
-        logger.debug(f"Processing line: {line}")
 
         # Parse RustScan open ports
         if match := open_port_regex.match(line):
@@ -32,7 +32,7 @@ async def parse_rustscan(stdout: str, all_hosts: set[Host]) -> None:
                 if host.ip_address == ip:
                     host.is_alive = True
                     if not any(p.port == port_num for p in host.ports):
-                        host.ports.append(PortInfo(port=port_num))
+                        host.ports.append(Port(port=port_num))
                     break
             else:
                 logger.warning(
@@ -55,7 +55,6 @@ async def parse_rustscan(stdout: str, all_hosts: set[Host]) -> None:
         # Parse Nmap detailed port info
         elif match := nmap_ports_regex.match(line):
             ip, ports_section = match.groups()
-            logger.debug(f"Nmap ports line matched: IP={ip}, Ports={ports_section}")
 
             for host in all_hosts:
                 if host.ip_address == ip:
@@ -75,13 +74,13 @@ async def parse_rustscan(stdout: str, all_hosts: set[Host]) -> None:
                             )
                             if existing_port:
                                 existing_port.service = service
-                                existing_port.version = version
+                                existing_port.technology = version
                             else:
                                 host.ports.append(
-                                    PortInfo(
+                                    Port(
                                         port=port_num,
                                         service=service,
-                                        version=version,
+                                        technology=version,
                                     )
                                 )
                     break

@@ -2,11 +2,12 @@ import ipaddress
 import logging
 import socket
 from typing import List
+from urllib.parse import urlparse
 
 from app.models.host_config import Host
 
 
-async def parse_targets(raw_targets: List[str]) -> set[Host]:
+async def parse_targets(raw_targets: List[str]) -> List[Host]:
     # List[Union[ipaddress.IPv4Address, ipaddress.IPv6Address, ipaddress.IPv4Network, ipaddress.IPv6Network]]:
     """
     Parses a list of raw target strings into ipaddress objects,
@@ -16,7 +17,8 @@ async def parse_targets(raw_targets: List[str]) -> set[Host]:
     """
     logger = logging.getLogger(__name__)
 
-    hosts = set()
+    hosts: list = []
+    ips: set = set()
 
     for target in raw_targets:
         target = target.strip()
@@ -39,7 +41,12 @@ async def parse_targets(raw_targets: List[str]) -> set[Host]:
                 logger.info(f"Parsing range: {start_ip} - {end_ip}")
                 current = start
                 while current <= end:
-                    hosts.add(Host(target=target, ip_address=str(current)))
+
+                    if str(current) in ips:
+                        continue
+                    ips.add(str(current))
+
+                    hosts.append(Host(target=target, ip_address=str(current)))
                     current = int(current) + 1
                     current = ipaddress.ip_address(current)
 
@@ -59,7 +66,12 @@ async def parse_targets(raw_targets: List[str]) -> set[Host]:
                     if len(hosts) > 9:
                         logger.warning(f"Too many IPs! Finishing adding it on IP: {ip}")
                         break
-                    hosts.add(Host(target=target, ip_address=str(ip)))
+
+                    if str(ip) in ips:
+                        continue
+                    ips.add(str(ip))
+
+                    hosts.append(Host(target=target, ip_address=str(ip)))
                 continue
 
             except ValueError as e:
@@ -75,21 +87,22 @@ async def parse_targets(raw_targets: List[str]) -> set[Host]:
         ):
             try:
                 # Extract hostname if it's a URL
-                hostname = target
-                if target.startswith("http://"):
-                    hostname = target[len("http://") :]
-                elif target.startswith("https://"):
-                    hostname = target[len("https://") :]
 
-                # Remove path and query parameters if present
-                if "/" in hostname:
-                    hostname = hostname.split("/")[0]
-                if "?" in hostname:
-                    hostname = hostname.split("?")[0]
+                # Use urlparse to properly extract host
+                parsed = urlparse(target if "://" in target else f"http://{target}")
+                hostname = parsed.hostname
 
                 ip_address = socket.gethostbyname(hostname)
                 logger.info(f"Resolved {hostname} to IP: {ip_address}")
-                hosts.add(Host(target=target, ip_address=ip_address))
+                if ip_address in ips:
+                    continue
+                ips.add(ip_address)
+                hosts.append(
+                    Host(
+                        target=target,
+                        ip_address=ip_address,
+                    )
+                )
                 continue
             except socket.gaierror as e:
                 logger.warning(f"Could not resolve domain/URL {target}: {e}")
@@ -100,7 +113,10 @@ async def parse_targets(raw_targets: List[str]) -> set[Host]:
         try:
             ip = ipaddress.ip_address(target)
             logger.info(f"Parsed single IP: {target}")
-            hosts.add(Host(target=target, ip_address=str(ip)))
+            if str(ip) in ips:
+                continue
+            ips.add(str(ip))
+            hosts.append(Host(target=target, ip_address=str(ip)))
             continue
         except ValueError as e:
             logger.error(f"Failed to parse IP {target}: {e}. Skipping.")

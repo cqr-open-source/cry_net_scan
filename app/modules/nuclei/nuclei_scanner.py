@@ -1,12 +1,11 @@
-import asyncio
-import logging
 from typing import List
 
-from app.core.paths import NUCLEI_HOSTS_PATH
+from app.core.paths import NUCLEI_PATH
 from app.core.paths import TOOLS_LINUX_NUCLEI_PATH
 from app.models.host_config import Host
-from app.modules.nuclei.http_hosts_to_file_writer import write_http_hosts_to_file
 from app.modules.nuclei.nuclei_parser import parse_nuclei
+from app.utils.http_to_file_writer import write_hosts_to_file
+from app.utils.subprocess_runner import subprocess_run
 
 
 async def nuclei_scan(
@@ -22,7 +21,11 @@ async def nuclei_scan(
     4. Parses the JSON output from Nuclei's stdout and updates the 'hosts' list in-place
        with any discovered vulnerabilities and additional port information.
     """
-    logger = logging.getLogger(__name__)
+    await write_hosts_to_file(
+        hosts=hosts,
+        file=NUCLEI_PATH,
+        need_ports=True,
+    )
 
     # [START] If we need to fast check!
     # from app.core.paths import ROOT_PATH
@@ -33,35 +36,19 @@ async def nuclei_scan(
     # return None
     # [END] If we need to fast check!
 
-    await write_http_hosts_to_file(
-        hosts=hosts,
-        file=NUCLEI_HOSTS_PATH,
-    )
-
     command = [
         str(TOOLS_LINUX_NUCLEI_PATH),
         "-l",
-        str(NUCLEI_HOSTS_PATH),
+        str(NUCLEI_PATH),
         "-jsonl",
     ]
-    logger.info(f"Running NUCLEI command: {' '.join(command)}")
 
-    try:
-        process = await asyncio.create_subprocess_exec(
-            *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-        )
+    result: str = await subprocess_run(
+        command=command,
+        module_name="NUCLEI",
+    )
 
-        stdout_bytes, stderr_bytes = await process.communicate()
-
-        stdout = stdout_bytes.decode("utf-8").strip()
-        stderr = stderr_bytes.decode("utf-8").strip()
-
-        if stderr:
-            logger.warning(f"NUCLEI stderr: {stderr}")
-
-        await parse_nuclei(nuclei_result=stdout, hosts=hosts)
-
-    except Exception as e:
-        logger.error(f"Error running RUSTSCAN or parsing output: {e}", exc_info=True)
+    if result:
+        await parse_nuclei(nuclei_result=result, hosts=hosts)
 
     return None
