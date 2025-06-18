@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from app.models.vulnerability_config import VulnerabilityInfo
 
 
-class PortInfo(BaseModel):
+class Port(BaseModel):
     """
     Represents detailed information about a single discovered port.
     """
@@ -17,8 +17,9 @@ class PortInfo(BaseModel):
         description="The name of the service running on the port (e.g., 'http', 'ssh').",
     )
 
-    version: Optional[str] = Field(
-        default_factory=str, description="Version of the service if detected by Nmap."
+    technology: Optional[str] = Field(
+        default_factory=str,
+        description="Technology of the service if detected by Nmap.",
     )
 
     vulnerabilities: List[VulnerabilityInfo] = Field(

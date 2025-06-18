@@ -3,6 +3,8 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from app.core.paths import REPORT_PATH
+
 
 class ScanConfig(BaseModel):
     """
@@ -37,7 +39,10 @@ class ScanConfig(BaseModel):
         "json", description="Specify the output report format."
     )
     report_base_dir: Path = Field(
-        ..., description="Base directory for saving scan reports."
+        default=REPORT_PATH, description="Base directory for saving scan reports."
+    )
+    report_file: Path = Field(
+        default="result.json", description="File for saving scan reports."
     )
     report_zip: bool = Field(
         False, description="Pack the report-related files into a ZIP archive."

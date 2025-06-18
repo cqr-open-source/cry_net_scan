@@ -2,7 +2,8 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from app.models.port_config import PortInfo
+from app.models.port_config import Port
+from app.models.technology_config import Technology
 
 
 class Host(BaseModel):
@@ -19,21 +20,20 @@ class Host(BaseModel):
     )
 
     # --- Basic Port/Service Information ---
-    ports: List[PortInfo] = Field(
+    ports: List[Port] = Field(
         default_factory=list, description="List of open TCP ports found on the host."
     )
 
-    # TODO: fields must be not required!
+    # --- Technologies (from Wappalyzer) ---
+    technologies: List[Technology] = Field(
+        default_factory=list, description="List of identified technologies"
+    )
+
     # services: List[Dict[str, Any]] = Field(
     #     [],
     #     description="List of discovered services on ports, e.g., [{'port': 80, 'name': 'http', 'version': 'nginx 1.20'}]"
     # )
-    #
-    # # --- Technologies (from Wappalyzer) ---
-    # technologies: List[Dict[str, Any]] = Field(
-    #     [],
-    #     description="List of identified technologies, e.g., [{'name': 'Nginx', 'version': '1.20', 'category': 'Web Servers'}]"
-    # )
+
     #
     # # --- Vulnerabilities / Findings (from Nuclei, Afrog, NullLinux, AI-generated NSE) ---
     # findings: List[Dict[str, Any]] = Field(
