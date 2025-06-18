@@ -112,6 +112,11 @@ async def init_args() -> argparse.Namespace:
         action="store_true",
         help="Pack the report-related files into a ZIP archive after completion.",
     )
+    report_group.add_argument(
+        "--report-file",
+        type=str,
+        help="Specify result file path.",
+    )
     # report_group.add_argument(
     #     "--report-metadata-override-dir", # Deferred for future implementation
     #     type=str,

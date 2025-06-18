@@ -13,12 +13,14 @@ TOOLS_PATH = ROOT_PATH.joinpath("tools")
 TOOLS_LINUX_PATH = TOOLS_PATH.joinpath("linux")
 TOOLS_LINUX_RUSTSCAN_PATH = TOOLS_LINUX_PATH.joinpath("rustscan", "rustscan")
 TOOLS_LINUX_NMAP_PATH = TOOLS_LINUX_PATH.joinpath("nmap", "nmap")
+TOOLS_LINUX_WEBANALYZE_PATH = TOOLS_LINUX_PATH.joinpath("webanalyze", "webanalyze")
 TOOLS_LINUX_NUCLEI_PATH = TOOLS_LINUX_PATH.joinpath("nuclei", "nuclei")
 
 TOOLS_WINDOWS_PATH = TOOLS_PATH.joinpath("windows")
 TOOLS_MACOS_PATH = TOOLS_PATH.joinpath("macos")
 
-NUCLEI_HOSTS_PATH = ROOT_PATH.joinpath("hosts.txt")
+WEBANALYZE_PATH = ROOT_PATH.joinpath("webanalyze.txt")
+NUCLEI_PATH = ROOT_PATH.joinpath("nuclei.txt")  # full host
 
 LOG_PATH = ROOT_PATH.joinpath("logs")
 LOG_FILE_PATH = LOG_PATH.joinpath(

@@ -1,12 +1,9 @@
 import argparse
 import logging
-from pathlib import Path
 
 from app.core.args import init_args
 from app.core.constants import APP_NAME
-from app.core.paths import REPORT_PATH
 from app.core.runner import run_tool
-from app.models.host_config import Host
 from app.models.scan_config import ScanConfig
 from app.utils.logging_utils import setup_logging
 from app.utils.system_utils import get_raw_cli_args, is_frozen
@@ -40,10 +37,6 @@ async def main():
     logger.info(f"Starting {APP_NAME}...")
 
     # --- ScanConfig from parsed arguments ---
-    report_base_dir_path: Path = (
-        Path(args.report_base_dir) if args.report_base_dir else REPORT_PATH
-    )
-
     scan_config: ScanConfig = ScanConfig(
         target=args.target,
         verbose=args.verbose,
@@ -55,8 +48,9 @@ async def main():
         disable_nuclei=args.disable_nuclei,
         disable_afrog=args.disable_afrog,
         report_format=args.report_format,
-        report_base_dir=report_base_dir_path,
+        report_base_dir=args.report_base_dir,
         report_zip=args.report_zip,
+        report_file=args.report_file,
     )
 
     # --- Launch Application Mode ---
@@ -66,6 +60,6 @@ async def main():
     else:
         logger.info("Running in CLI mode (default).")
 
-        all_hosts: set[Host] = await run_tool(scan_config=scan_config)  # noqa: F841
+        await run_tool(scan_config=scan_config)
 
     logger.info(f"{APP_NAME} finished.")
