@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 from app.core.paths import REPORT_PATH
 from app.core.constants import APP_NAME
@@ -115,6 +116,7 @@ async def init_args() -> argparse.Namespace:
     report_group.add_argument(
         "--report-file",
         type=str,
+        default=Path("result.json"),
         help="Specify result file path.",
     )
     # report_group.add_argument(

@@ -3,8 +3,6 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-from app.core.paths import REPORT_PATH
-
 
 class ScanConfig(BaseModel):
     """
@@ -14,14 +12,14 @@ class ScanConfig(BaseModel):
     target: List[str] = Field(
         ..., description="List of target specifications (IPs, CIDRs, ranges)."
     )
-    verbose: bool = Field(False, description="Enable verbose logging (DEBUG level).")
+    verbose: bool = Field(..., description="Enable verbose logging (DEBUG level).")
 
     ai_provider: Optional[Literal["openai", "anthropic"]] = Field(
         None, description="Specify the AI provider to use."
     )
     ai_model: Optional[str] = Field(None, description="Specify the AI model to use.")
     ai_api_key: Optional[str] = Field(None, description="API key for the AI service.")
-    ai_no_cache: bool = Field(False, description="Disable AI response caching.")
+    ai_no_cache: bool = Field(..., description="Disable AI response caching.")
     ai_limit_nse: int = Field(
         3,
         ge=0,
@@ -29,21 +27,19 @@ class ScanConfig(BaseModel):
     )
 
     disable_nuclei: bool = Field(
-        False, description="Disable Nuclei vulnerability scanning."
+        ..., description="Disable Nuclei vulnerability scanning."
     )
     disable_afrog: bool = Field(
-        False, description="Disable Afrog open database scanning."
+        ..., description="Disable Afrog open database scanning."
     )
 
     report_format: Literal["json", "pdf"] = Field(
-        "json", description="Specify the output report format."
+        ..., description="Specify the output report format."
     )
     report_base_dir: Path = Field(
-        default=REPORT_PATH, description="Base directory for saving scan reports."
+        ..., description="Base directory for saving scan reports."
     )
-    report_file: Path = Field(
-        default="result.json", description="File for saving scan reports."
-    )
+    report_file: Path = Field(..., description="File for saving scan reports.")
     report_zip: bool = Field(
-        False, description="Pack the report-related files into a ZIP archive."
+        ..., description="Pack the report-related files into a ZIP archive."
     )

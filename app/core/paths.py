@@ -3,6 +3,10 @@ from datetime import datetime
 
 from app.core.constants import APP_NAME_SNAKE_CASE
 
+# Home directory. Like ~/
+# In home directory, we'll have permission to create files.
+HOME_PATH = pathlib.Path.home()
+
 ROOT_PATH = pathlib.Path(__file__).parent.parent.parent.absolute()
 APP_PATH = ROOT_PATH.joinpath("app")
 CORE_PATH = APP_PATH.joinpath("core")
@@ -15,12 +19,15 @@ TOOLS_LINUX_RUSTSCAN_PATH = TOOLS_LINUX_PATH.joinpath("rustscan", "rustscan")
 TOOLS_LINUX_NMAP_PATH = TOOLS_LINUX_PATH.joinpath("nmap", "nmap")
 TOOLS_LINUX_WEBANALYZE_PATH = TOOLS_LINUX_PATH.joinpath("webanalyze", "webanalyze")
 TOOLS_LINUX_NUCLEI_PATH = TOOLS_LINUX_PATH.joinpath("nuclei", "nuclei")
+TOOLS_LINUX_AFROG_PATH = TOOLS_LINUX_PATH.joinpath("afrog", "afrog")
 
 TOOLS_WINDOWS_PATH = TOOLS_PATH.joinpath("windows")
 TOOLS_MACOS_PATH = TOOLS_PATH.joinpath("macos")
 
-WEBANALYZE_PATH = ROOT_PATH.joinpath("webanalyze.txt")
-NUCLEI_PATH = ROOT_PATH.joinpath("nuclei.txt")  # full host
+HOSTS_PATH = HOME_PATH.joinpath("hosts.txt")
+NUCLEI_PATH = HOME_PATH.joinpath("nuclei.txt")  # full host
+# AFROG_TEMP_PATH = ROOT_PATH.joinpath("afrog.json")
+AFROG_TEMP_PATH = HOME_PATH.joinpath("afrog.json")
 
 LOG_PATH = ROOT_PATH.joinpath("logs")
 LOG_FILE_PATH = LOG_PATH.joinpath(

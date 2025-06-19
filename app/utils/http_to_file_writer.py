@@ -1,5 +1,5 @@
 import pathlib
-from typing import List
+from typing import List, Set
 from urllib.parse import urlparse
 
 from app.models.host_config import Host
@@ -10,7 +10,7 @@ async def write_hosts_to_file(
     file: pathlib.Path,
     need_ports: bool = False,
 ) -> None:
-    urls = []
+    urls: Set = set()
 
     for host in hosts:
         for port in host.ports:
@@ -36,7 +36,7 @@ async def write_hosts_to_file(
                     else f"{service}://{medium_part}"
                 )
 
-                urls.append(url)
+                urls.add(url)
 
     file.write_text("\n".join(urls), encoding="utf-8")
 
