@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from app.models.host_config import Host
+from app.models.scanner_config import ScannerName
 from app.models.technology_config import Technology
 from app.modules.webanalyze.duplicate_finder import search_duplicate_technologies
 from app.utils.host_getter import get_host
@@ -22,7 +23,7 @@ async def parse_webanalyze(result: str, hosts: List[Host]) -> None:
             )
             if host:
                 logger.debug(
-                    f"Discover Webanalyze technologies for host: {host.ip_address}"
+                    f"{host.ip_address}: discover {ScannerName.WEBANALYZE.value} technologies"
                 )
 
                 for technology_data in host_data["matches"]:

@@ -1,26 +1,30 @@
 import json
 import logging
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from app.models.host_config import Host
 from app.models.port_config import Port
-from app.models.vulnerability_config import VulnerabilityInfo
+from app.models.raw_http_exchange_config import RawHttpExchange
+from app.models.scanner_config import ScannerName
+from app.models.vulnerability_config import Vulnerability
 from app.utils.host_getter import get_host
 from app.utils.jsonl_parser import parse_jsonl
 
 
 async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
     """
-    Parses a multiline string of Nuclei JSONL outputs (nuclei_result) and adds the discovered
+    Parses a multiline string of Nuclei JSONL outputs and adds the discovered
     vulnerabilities to the appropriate Host and Port objects within the
-    provided 'hosts' list. This function modifies the 'hosts' list in-place.
+    provided 'hosts' list.
     """
     logger = logging.getLogger(__name__)
 
     # Parse the JSONL content into a list of dictionaries
     parsed_objects: List[dict] | List[None] = await parse_jsonl(
-        jsonl_content=nuclei_result
+        jsonl_content=nuclei_result,
     )
+
+    appended_vulnerabilities: Set = set()
 
     for result_item in parsed_objects:
         nuclei_ip_address = result_item.get("ip")
@@ -40,13 +44,14 @@ async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
             )
             if not found_host:
                 logger.warning(
-                    f"Skipping Nuclei result due to missing IP address: {result_item.get('template-id')}"
+                    f"Skipping {ScannerName.NUCLEI.value} result due to missing IP address"
                 )
                 continue
 
         if not found_host:
             logger.warning(
-                f"Host with IP {nuclei_ip_address} found in Nuclei output but not in the provided hosts list. Skipping vulnerability for this host."
+                f"Host with IP {nuclei_ip_address} found in {ScannerName.NUCLEI.value} output but not in the provided hosts list. "
+                f"Skipping vulnerability for this host."
             )
             continue
 
@@ -101,7 +106,14 @@ async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
                         else [classification_data["cwe-id"]]
                     )
 
-            vulnerability = VulnerabilityInfo(
+            raw_http_exchange: List = [
+                RawHttpExchange(
+                    request=result_item.get("request"),
+                    response=result_item.get("response"),
+                )
+            ]
+
+            vulnerability = Vulnerability(
                 template_id=result_item["template-id"],
                 template_url=result_item.get("template-url"),
                 name=result_item["info"]["name"],
@@ -113,19 +125,25 @@ async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
                 remediation=result_item["info"].get("remediation"),
                 type=result_item["type"],
                 extracted_results=result_item.get("extracted-results"),
-                request=result_item.get("request"),
-                response=result_item.get("response"),
+                raw_http_exchange=raw_http_exchange,
                 curl_command=result_item.get("curl-command"),
+                scanner_name=ScannerName.NUCLEI.value,
             )
+
+            if vulnerability.name in appended_vulnerabilities:
+                continue
+
+            appended_vulnerabilities.add(vulnerability.name)
             found_port_info.vulnerabilities.append(vulnerability)
 
-            logger.debug(
-                f"Found {vulnerability} for {nuclei_ip_address} on port {port}"
+            logger.info(
+                f"{nuclei_ip_address}:{port}: vulnerability '{vulnerability.name}' "
+                f"with severity '{vulnerability.severity}'"
             )
 
         except Exception as e:
             logger.error(
-                f"Error creating VulnerabilityInfo for {result_item.get('template-id')} on IP {nuclei_ip_address}: {e}"
+                f"Error creating Vulnerability for {result_item.get('template-id')} on IP {nuclei_ip_address}: {e}"
             )
             logger.error(f"Problematic data: {json.dumps(result_item, indent=2)}")
             continue

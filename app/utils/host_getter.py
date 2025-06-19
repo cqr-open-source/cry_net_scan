@@ -17,10 +17,11 @@ async def get_host(
                 return host
         else:
             # If target is domain, but data is url, we need to extract the domain part
-            start_index = data.index("//")
+            start_index = data.find("//")
             data = data[start_index if start_index != -1 else 0 :]
 
-            if data in host.target:
+            # TODO: Check if it is correct. Target AND IP address?
+            if data in host.target or data in host.ip_address:
                 return host
 
     logger.warning(f"Host with data '{data}' not found in the provided hosts list.")

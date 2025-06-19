@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
-from app.models.vulnerability_config import VulnerabilityInfo
+from app.models.vulnerability_config import Vulnerability
 
 
 class Port(BaseModel):
@@ -22,6 +22,6 @@ class Port(BaseModel):
         description="Technology of the service if detected by Nmap.",
     )
 
-    vulnerabilities: List[VulnerabilityInfo] = Field(
+    vulnerabilities: List[Vulnerability] = Field(
         default_factory=list, description="List of vulnerabilities."
     )

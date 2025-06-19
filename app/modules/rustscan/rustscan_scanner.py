@@ -2,6 +2,7 @@ from typing import List
 
 from app.core.paths import TOOLS_LINUX_RUSTSCAN_PATH
 from app.models.host_config import Host
+from app.models.scanner_config import ScannerName
 from app.modules.rustscan.rustscan_parser import parse_rustscan
 from app.utils.subprocess_runner import subprocess_run
 
@@ -31,7 +32,7 @@ async def rustscan_scan(
 
     result: str = await subprocess_run(
         command=command,
-        module_name="RUSTSCAN",
+        module_name=ScannerName.RUSTSCAN.value,
     )
 
     if result:

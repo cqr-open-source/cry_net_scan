@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from app.models.port_config import Port
 from app.models.technology_config import Technology
+from app.models.vulnerability_config import Vulnerability
 
 
 class Host(BaseModel):
@@ -27,6 +28,11 @@ class Host(BaseModel):
     # --- Technologies (from Wappalyzer) ---
     technologies: List[Technology] = Field(
         default_factory=list, description="List of identified technologies"
+    )
+
+    # --- Vulnerabilities (from Afrog) ---
+    vulnerabilities: List[Vulnerability] = Field(
+        default_factory=list, description="List of vulnerabilities."
     )
 
     # services: List[Dict[str, Any]] = Field(

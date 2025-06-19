@@ -18,15 +18,19 @@ async def parse_jsonl(jsonl_content: str) -> List[dict] | List[None]:
 
     # Reconstruct each JSON object
     for i, part in enumerate(raw_json_objects):
-        if i == 0:
-            # First part should already start with '{'
-            full_json_str = part + "}"
-        elif i == len(raw_json_objects) - 1:
-            # Last part should already end with '}'
-            full_json_str = "{" + part
+        if len(raw_json_objects) > 1:
+            if i == 0:
+                # First part should already start with '{'
+                full_json_str = part + "}"
+            elif i == len(raw_json_objects) - 1:
+                # Last part should already end with '}'
+                full_json_str = "{" + part
+            else:
+                # Middle parts need both '{' and '}'
+                full_json_str = "{" + part + "}"
         else:
-            # Middle parts need both '{' and '}'
-            full_json_str = "{" + part + "}"
+            # If there's only one part, it should be a complete JSON object
+            full_json_str = part
 
         try:
             parsed_objects.append(json.loads(full_json_str))

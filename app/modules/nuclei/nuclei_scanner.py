@@ -3,6 +3,7 @@ from typing import List
 from app.core.paths import NUCLEI_PATH
 from app.core.paths import TOOLS_LINUX_NUCLEI_PATH
 from app.models.host_config import Host
+from app.models.scanner_config import ScannerName
 from app.modules.nuclei.nuclei_parser import parse_nuclei
 from app.utils.http_to_file_writer import write_hosts_to_file
 from app.utils.subprocess_runner import subprocess_run
@@ -45,7 +46,7 @@ async def nuclei_scan(
 
     result: str = await subprocess_run(
         command=command,
-        module_name="NUCLEI",
+        module_name=ScannerName.NUCLEI.value,
     )
 
     if result:

@@ -4,6 +4,7 @@ from typing import List
 
 from app.models.host_config import Host
 from app.models.port_config import Port
+from app.models.scanner_config import ScannerName
 
 
 async def parse_rustscan(stdout: str, all_hosts: List[Host]) -> None:
@@ -22,7 +23,7 @@ async def parse_rustscan(stdout: str, all_hosts: List[Host]) -> None:
     for line in stdout.split("\n"):
         line = line.strip()
 
-        # Parse RustScan open ports
+        # Parse open ports
         if match := open_port_regex.match(line):
             ip, port = match.groups()
             port_num = int(port)
@@ -36,7 +37,7 @@ async def parse_rustscan(stdout: str, all_hosts: List[Host]) -> None:
                     break
             else:
                 logger.warning(
-                    f"IP {ip} found in RustScan output but not in initial hosts set."
+                    f"IP {ip} found in {ScannerName.RUSTSCAN.value} output but not in initial hosts set."
                 )
 
         # Parse Nmap host status

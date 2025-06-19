@@ -1,6 +1,7 @@
 import logging
 
 from app.models.host_config import Host
+from app.utils.parsing_utils import is_substring
 
 
 async def search_duplicate_technologies(host: Host, technology: str) -> bool:
@@ -11,7 +12,10 @@ async def search_duplicate_technologies(host: Host, technology: str) -> bool:
     logger = logging.getLogger(__name__)
 
     for port_info in host.ports:
-        if port_info.technology in technology or technology in port_info.technology:
+        if await is_substring(
+            str1=port_info.technology,
+            str2=technology,
+        ):
             logger.debug(
                 f"Duplicate technology {technology} found on port {port_info.port} for host {host.ip_address}. Skipping."
             )
