@@ -3,40 +3,44 @@ from typing import List, Set
 from urllib.parse import urlparse
 
 from app.models.host_config import Host
+from app.models.target_type_config import TargetType
 
 
 async def write_hosts_to_file(
     hosts: List[Host],
     file: pathlib.Path,
     need_ports: bool = False,
+    need_http: bool = False,
+    need_ips: bool = False,
 ) -> None:
     urls: Set = set()
 
     for host in hosts:
+        domain_part = host.ip_address
+
+        if not need_ips:
+            if host.target_type == TargetType.url:
+                # If the target is a URL, we need to parse it
+                domain_part = urlparse(host.target).hostname
+            elif host.target_type == TargetType.domain:
+                # If the target is a domain, we use the domain directly
+                domain_part = host.target
+
         for port in host.ports:
             service = port.service.lower()
-            if service in ("http", "https"):
-                if (
-                    host.target != host.ip_address
-                    and host.ip_address not in host.target
-                ):
-                    if host.target.startswith("http"):
-                        # Url
-                        medium_part = urlparse(host.target).hostname
-
-                    else:
-                        # Domain
-                        medium_part = host.target
+            if need_http:
+                if service.startswith("http"):
+                    http_part = f"{service}://"
                 else:
-                    medium_part = host.ip_address
+                    http_part = "http://"
+            else:
+                http_part = ""
 
-                url = (
-                    f"{service}://{medium_part}:{port.port}"
-                    if need_ports
-                    else f"{service}://{medium_part}"
-                )
+            port_part = f":{port.port}" if need_ports else ""
 
-                urls.add(url)
+            url = f"{http_part}{domain_part}{port_part}"
+
+            urls.add(url)
 
     file.write_text("\n".join(urls), encoding="utf-8")
 

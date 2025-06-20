@@ -2,7 +2,9 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
+from app.models.application_config import Application
 from app.models.port_config import Port
+from app.models.target_type_config import TargetType
 from app.models.technology_config import Technology
 from app.models.vulnerability_config import Vulnerability
 
@@ -14,10 +16,20 @@ class Host(BaseModel):
     """
 
     target: str = Field(..., description="Provided target.")
+    target_type: TargetType = Field(
+        default=TargetType.url.value,
+        description="Type of the target, e.g., 'url', 'domain', 'ip', etc.",
+    )
     ip_address: str = Field(..., description="The IP address of the host.")
+
     is_alive: bool = Field(
         default=False,
         description="True if the host was found to be alive during discovery.",
+    )
+
+    associated_applications: List[Application] = Field(
+        default_factory=list,
+        description="List of applications associated with this host. If the target is domain or url, this will contain the main application.",
     )
 
     # --- Basic Port/Service Information ---

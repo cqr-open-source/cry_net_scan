@@ -18,7 +18,7 @@ async def get_host(
         else:
             # If target is domain, but data is url, we need to extract the domain part
             start_index = data.find("//")
-            data = data[start_index if start_index != -1 else 0 :]
+            data = data[start_index + 2 if start_index != -1 else 0 :]
 
             # TODO: Check if it is correct. Target AND IP address?
             if data in host.target or data in host.ip_address:

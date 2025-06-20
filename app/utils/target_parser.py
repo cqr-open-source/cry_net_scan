@@ -1,126 +1,56 @@
-import ipaddress
 import logging
-import socket
-from typing import List
-from urllib.parse import urlparse
+from typing import List, Dict, Tuple
 
+from app.models.application_config import Application
 from app.models.host_config import Host
+from app.utils.args_parser.ip_cidr_parser import parse_ip_cidr
+from app.utils.args_parser.ip_range_parser import parse_ip_range
+from app.utils.args_parser.ip_single_parser import parse_single_ip
+from app.utils.args_parser.url_domain_parser import parse_url_domain
 
 
-async def parse_targets(raw_targets: List[str]) -> List[Host]:
-    # List[Union[ipaddress.IPv4Address, ipaddress.IPv6Address, ipaddress.IPv4Network, ipaddress.IPv6Network]]:
+async def parse_targets(raw_targets: List[str]) -> Tuple[List[Host], List[Application]]:
     """
-    Parses a list of raw target strings into ipaddress objects,
-    or resolves domain names/URLs to IP addresses.
-    Supports single IPs, CIDR ranges, IP ranges (e.g., 192.168.1.1-192.168.1.10),
-    and domain names/URLs.
+    Parses a list of raw target strings into Host and Application objects.
+    Supports single IPs, CIDR ranges, IP ranges, and domain names/URLs.
     """
     logger = logging.getLogger(__name__)
 
-    hosts: list = []
-    ips: set = set()
+    # Use dictionaries to ensure uniqueness by IP address for Hosts
+    # and by canonical URL for Applications.
+    unique_hosts_by_ip: Dict[str, Host] = {}
+    unique_applications_by_url: Dict[str, Application] = {}
+
+    logger.info(f"Targets to validate: {len(raw_targets)}")
 
     for target in raw_targets:
         target = target.strip()
-        logger.info(f"Processing target: {target}")
+        logger.debug(f"Processing target: {target}")
 
-        # Try to parse as IP range (e.g., "192.168.1.1 - 192.168.1.255")
+        # Check in specific order: IP Range, CIDR, URL/Domain, then Single IP as fallback
         if "-" in target and not target.startswith("http"):
-            try:
-                start_ip, end_ip = [ip.strip() for ip in target.split("-")]
-                start = ipaddress.ip_address(start_ip)
-                end = ipaddress.ip_address(end_ip)
+            await parse_ip_range(target=target, unique_hosts_by_ip=unique_hosts_by_ip)
 
-                # Ensure both IPs are of the same version
-                if start.version != end.version:
-                    logger.warning(
-                        f"Skipping invalid range (mismatched IP versions): {target}"
-                    )
-                    continue
+        elif "/" in target and "//" not in target:
+            await parse_ip_cidr(target=target, unique_hosts_by_ip=unique_hosts_by_ip)
 
-                logger.info(f"Parsing range: {start_ip} - {end_ip}")
-                current = start
-                while current <= end:
-
-                    if str(current) in ips:
-                        continue
-                    ips.add(str(current))
-
-                    hosts.append(Host(target=target, ip_address=str(current)))
-                    current = int(current) + 1
-                    current = ipaddress.ip_address(current)
-
-                continue
-            except ValueError as e:
-                logger.error(f"Failed to parse range {target}: {e}")
-                raise e
-
-        # Try to parse as CIDR (e.g., "192.168.1.0/24" or "2001:db8::/64")
-        if "/" in target and "//" not in target:
-            try:
-                network = ipaddress.ip_network(target, strict=False)
-                logger.info(f"Parsing CIDR: {target}")
-                for ip in network:
-                    # Added limit for CIDR.
-                    # TODO: find better decision
-                    if len(hosts) > 9:
-                        logger.warning(f"Too many IPs! Finishing adding it on IP: {ip}")
-                        break
-
-                    if str(ip) in ips:
-                        continue
-                    ips.add(str(ip))
-
-                    hosts.append(Host(target=target, ip_address=str(ip)))
-                continue
-
-            except ValueError as e:
-                logger.error(f"Failed to parse CIDR {target}: {e}")
-                continue
-
-        # Try to resolve as a domain or URL
-        # Simple check for potential domain/URL (lacks space, has a dot, or starts with http/https)
-        if " " not in target and (
+        elif " " not in target and (
             "." in target
             or target.startswith("http://")
             or target.startswith("https://")
         ):
-            try:
-                # Extract hostname if it's a URL
+            await parse_url_domain(
+                target=target,
+                unique_hosts_by_ip=unique_hosts_by_ip,
+                unique_applications_by_url=unique_applications_by_url,
+            )
+        else:
+            # If none of the above, try to parse as a single IP
+            await parse_single_ip(target=target, unique_hosts_by_ip=unique_hosts_by_ip)
 
-                # Use urlparse to properly extract host
-                parsed = urlparse(target if "://" in target else f"http://{target}")
-                hostname = parsed.hostname
+    logger.info(f"Total unique hosts processed: {len(unique_hosts_by_ip)}")
+    logger.info(
+        f"Total unique applications processed: {len(unique_applications_by_url)}"
+    )
 
-                ip_address = socket.gethostbyname(hostname)
-                logger.info(f"Resolved {hostname} to IP: {ip_address}")
-                if ip_address in ips:
-                    continue
-                ips.add(ip_address)
-                hosts.append(
-                    Host(
-                        target=target,
-                        ip_address=ip_address,
-                    )
-                )
-                continue
-            except socket.gaierror as e:
-                logger.warning(f"Could not resolve domain/URL {target}: {e}")
-            except ValueError as e:
-                logger.error(f"Error processing URL/domain {target}: {e}")
-
-        # Try to parse as single IP (e.g., "192.168.1.1" or "2001:db8::1")
-        try:
-            ip = ipaddress.ip_address(target)
-            logger.info(f"Parsed single IP: {target}")
-            if str(ip) in ips:
-                continue
-            ips.add(str(ip))
-            hosts.append(Host(target=target, ip_address=str(ip)))
-            continue
-        except ValueError as e:
-            logger.error(f"Failed to parse IP {target}: {e}. Skipping.")
-            continue
-
-    logger.info(f"Total IPs added: {len(hosts)}")
-    return hosts
+    return list(unique_hosts_by_ip.values()), list(unique_applications_by_url.values())

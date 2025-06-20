@@ -24,6 +24,7 @@ TOOLS_LINUX_AFROG_PATH = TOOLS_LINUX_PATH.joinpath("afrog", "afrog")
 TOOLS_WINDOWS_PATH = TOOLS_PATH.joinpath("windows")
 TOOLS_MACOS_PATH = TOOLS_PATH.joinpath("macos")
 
+WEBANALYZE_PATH = HOME_PATH.joinpath("webanalyze.txt")
 HOSTS_PATH = HOME_PATH.joinpath("hosts.txt")
 NUCLEI_PATH = HOME_PATH.joinpath("nuclei.txt")  # full host
 # AFROG_TEMP_PATH = ROOT_PATH.joinpath("afrog.json")

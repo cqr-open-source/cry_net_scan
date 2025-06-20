@@ -1,6 +1,6 @@
 from typing import List
 
-from app.core.paths import HOSTS_PATH, TOOLS_LINUX_WEBANALYZE_PATH
+from app.core.paths import TOOLS_LINUX_WEBANALYZE_PATH, WEBANALYZE_PATH
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.webanalyze.webanalyze_parser import parse_webanalyze
@@ -11,17 +11,17 @@ from app.utils.subprocess_runner import subprocess_run
 async def webanalyze_scan(
     hosts: List[Host],
 ) -> None:
-    """Executes a technology detection scan on the provided list of hosts using Webanalyze."""
+    """Executes a technology detection scan on the provided list of urls/domains/ips using Webanalyze."""
 
     await write_hosts_to_file(
         hosts=hosts,
-        file=HOSTS_PATH,
+        file=WEBANALYZE_PATH,
     )
 
     command = [
         str(TOOLS_LINUX_WEBANALYZE_PATH),
         "-hosts",
-        str(HOSTS_PATH),
+        str(WEBANALYZE_PATH),
         "-output",
         "json",
     ]

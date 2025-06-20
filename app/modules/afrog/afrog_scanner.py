@@ -21,12 +21,11 @@ async def afrog_scan(
     """
     logger = logging.getLogger(__name__)
 
-    # Save hosts to the file if it does not exist
-    if not os.path.exists(HOSTS_PATH):
-        await write_hosts_to_file(
-            hosts=hosts,
-            file=HOSTS_PATH,
-        )
+    # Save urls, domains, IPs
+    await write_hosts_to_file(
+        hosts=hosts,
+        file=HOSTS_PATH,
+    )
 
     command = [
         str(TOOLS_LINUX_AFROG_PATH),

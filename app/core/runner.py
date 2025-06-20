@@ -1,8 +1,9 @@
 import logging
-from typing import List
+from typing import List, Tuple
 
 from app.core.data_saver import save_data
 from app.core.file_remover import delete_temp_files
+from app.models.application_config import Application
 from app.models.host_config import Host
 from app.models.scan_config import ScanConfig
 from app.modules.afrog.afrog_scanner import afrog_scan
@@ -20,7 +21,12 @@ async def run_tool(scan_config: ScanConfig) -> None:
     logger = logging.getLogger(__name__)
 
     # Get parsed hosts
-    all_hosts: List[Host] = await parse_targets(raw_targets=scan_config.target)
+    result: Tuple[List[Host], List[Application]] = await parse_targets(
+        raw_targets=scan_config.target
+    )
+    all_hosts: List[Host] = result[0]
+    applications: List[Application] = result[1]  # noqa: F841
+
     if not all_hosts:
         logger.info("There are no VALID targets.")
         return None

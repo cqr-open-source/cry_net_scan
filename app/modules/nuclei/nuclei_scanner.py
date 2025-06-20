@@ -13,19 +13,21 @@ async def nuclei_scan(
     hosts: List[Host],
 ) -> None:
     """Executes a vulnerability scan on the provided list of hosts using the Nuclei scanner.
+    Target: list of IPs with HTTP ports."""
 
-    This function performs the following steps:
-    1. Writes the HTTP-enabled hosts from the input 'hosts' list to a temporary file,
-       which serves as Nuclei's target list.
-    2. Constructs and executes the Nuclei command with JSON output enabled.
-    3. Captures the standard output (stdout) and standard error (stderr) from the Nuclei process.
-    4. Parses the JSON output from Nuclei's stdout and updates the 'hosts' list in-place
-       with any discovered vulnerabilities and additional port information.
-    """
+    # Get IPS with HTTP/HTTPS ports
+    required_hosts: List[Host] = []
+    for host in hosts:
+        for port in host.ports:
+            if port.service in ("http", "https"):
+                required_hosts.append(host)
+            break
+
     await write_hosts_to_file(
-        hosts=hosts,
+        hosts=required_hosts,
         file=NUCLEI_PATH,
         need_ports=True,
+        need_ips=True,
     )
 
     # [START] If we need to fast check!
