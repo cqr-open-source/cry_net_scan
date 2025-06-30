@@ -14,15 +14,16 @@ CORE_PATH = APP_PATH.joinpath("core")
 TESTS_PATH = ROOT_PATH.joinpath("tests")
 
 TOOLS_PATH = ROOT_PATH.joinpath("tools")
-TOOLS_LINUX_PATH = TOOLS_PATH.joinpath("linux")
-TOOLS_LINUX_RUSTSCAN_PATH = TOOLS_LINUX_PATH.joinpath("rustscan", "rustscan")
-TOOLS_LINUX_NMAP_PATH = TOOLS_LINUX_PATH.joinpath("nmap", "nmap")
-TOOLS_LINUX_WEBANALYZE_PATH = TOOLS_LINUX_PATH.joinpath("webanalyze", "webanalyze")
-TOOLS_LINUX_NUCLEI_PATH = TOOLS_LINUX_PATH.joinpath("nuclei", "nuclei")
-TOOLS_LINUX_AFROG_PATH = TOOLS_LINUX_PATH.joinpath("afrog", "afrog")
 
+TOOLS_LINUX_PATH = TOOLS_PATH.joinpath("linux")
 TOOLS_WINDOWS_PATH = TOOLS_PATH.joinpath("windows")
 TOOLS_MACOS_PATH = TOOLS_PATH.joinpath("macos")
+
+# TOOLS_RUSTSCAN_PATH = TOOLS_LINUX_PATH.joinpath("rustscan", "rustscan")
+# TOOLS_NMAP_PATH = TOOLS_LINUX_PATH.joinpath("nmap", "nmap")
+# TOOLS_WEBANALYZE_PATH = TOOLS_LINUX_PATH.joinpath("webanalyze", "webanalyze")
+# TOOLS_NUCLEI_PATH = TOOLS_LINUX_PATH.joinpath("nuclei", "nuclei")
+# TOOLS_AFROG_PATH = TOOLS_LINUX_PATH.joinpath("afrog", "afrog")
 
 WEBANALYZE_PATH = HOME_PATH.joinpath("webanalyze.txt")
 HOSTS_PATH = HOME_PATH.joinpath("hosts.txt")

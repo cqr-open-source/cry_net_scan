@@ -1,6 +1,8 @@
+import asyncio
 import logging
 from typing import List, Tuple
 
+import app.utils.paths_getter as paths_getter
 from app.core.data_saver import save_data
 from app.core.file_remover import delete_temp_files
 from app.models.application_config import Application
@@ -10,6 +12,7 @@ from app.modules.afrog.afrog_scanner import afrog_scan
 from app.modules.nuclei.nuclei_scanner import nuclei_scan
 from app.modules.rustscan.rustscan_scanner import rustscan_scan
 from app.modules.webanalyze.webanalyze_scanner import webanalyze_scan
+from app.utils.chmod_adder import make_executable
 from app.utils.target_parser import parse_targets
 
 
@@ -31,8 +34,20 @@ async def run_tool(scan_config: ScanConfig) -> None:
         logger.info("There are no VALID targets.")
         return None
 
+    # Get tools paths per system
+    paths_getter.get_paths(system_name=scan_config.system_name)
+    # Make these tools paths executable
+    tasks = [
+        make_executable(str(tool_path), scan_config.system_name)
+        for tool_path in paths_getter.TOOLS_PATHS.values()
+    ]
+
+    await asyncio.gather(*tasks)
+
     # Identify live hosts, open ports, and associated services.
-    await rustscan_scan(all_hosts=all_hosts)
+    await rustscan_scan(
+        all_hosts=all_hosts,
+    )
 
     # Gather only live hosts
     live_hosts: List[Host] = get_live_hosts_only(all_hosts=all_hosts)
@@ -42,15 +57,21 @@ async def run_tool(scan_config: ScanConfig) -> None:
         return None
 
     # Detect technologies
-    await webanalyze_scan(hosts=live_hosts)
+    await webanalyze_scan(
+        hosts=live_hosts,
+    )
 
     # Executes a vulnerability scan on the provided list of hosts with ports.
     if not scan_config.disable_nuclei:
-        await nuclei_scan(hosts=live_hosts)
+        await nuclei_scan(
+            hosts=live_hosts,
+        )
 
     # Executes a vulnerability scan on the provided list of hosts.
     if not scan_config.disable_afrog:
-        await afrog_scan(hosts=live_hosts)
+        await afrog_scan(
+            hosts=live_hosts,
+        )
 
     # for host in live_hosts:
     #     await rustscan_scan(host=host)

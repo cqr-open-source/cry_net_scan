@@ -1,9 +1,11 @@
 import json
 import logging
 import os
+import pathlib
 from typing import List
 
-from app.core.paths import HOSTS_PATH, TOOLS_LINUX_AFROG_PATH, AFROG_TEMP_PATH
+import app.utils.paths_getter as paths_getter
+from app.core.paths import HOSTS_PATH, AFROG_TEMP_PATH
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.afrog.afrog_parser import parse_afrog
@@ -12,7 +14,7 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def afrog_scan(
-    hosts: List[Host],
+        hosts: List[Host],
 ) -> None:
     """
     Executes an `afrog` vulnerability scan against provided hosts.
@@ -27,8 +29,10 @@ async def afrog_scan(
         file=HOSTS_PATH,
     )
 
+    afrog_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.NUCLEI.value.lower()]
+
     command = [
-        str(TOOLS_LINUX_AFROG_PATH),
+        str(afrog_path),
         "-target-file",
         str(HOSTS_PATH),
         "-concurrency",

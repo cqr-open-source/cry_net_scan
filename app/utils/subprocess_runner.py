@@ -4,8 +4,8 @@ from typing import List
 
 
 async def subprocess_run(
-    command: List[str],
-    module_name: str,
+        command: List[str],
+        module_name: str,
 ) -> str:
     logger = logging.getLogger(__name__)
 

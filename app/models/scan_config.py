@@ -3,6 +3,8 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
+from app.models.system_config import SystemName
+
 
 class ScanConfig(BaseModel):
     """
@@ -43,3 +45,6 @@ class ScanConfig(BaseModel):
     report_zip: bool = Field(
         ..., description="Pack the report-related files into a ZIP archive."
     )
+
+    system_name: SystemName = Field(...,
+                                    description="Detect the system name.")

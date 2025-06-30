@@ -1,6 +1,7 @@
+import pathlib
 from typing import List
 
-from app.core.paths import TOOLS_LINUX_RUSTSCAN_PATH
+import app.utils.paths_getter as paths_getter
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.models.target_type_config import TargetType
@@ -9,7 +10,7 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def rustscan_scan(
-    all_hosts: List[Host],
+        all_hosts: List[Host],
 ) -> None:
     """Performs network scanning using RustScan and Nmap to identify live hosts, open ports, and associated services.
 
@@ -24,8 +25,10 @@ async def rustscan_scan(
         else:
             targets.append(host.ip_address)
 
+    rustscan_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.RUSTSCAN.value.lower()]
+
     command = [
-        str(TOOLS_LINUX_RUSTSCAN_PATH),
+        str(rustscan_path),
         "-a",
         ",".join(targets),
         "--no-banner",

@@ -6,6 +6,7 @@ from app.core.constants import APP_NAME
 from app.core.runner import run_tool
 from app.models.scan_config import ScanConfig
 from app.utils.logging_utils import setup_logging
+from app.utils.system_detector import get_system_name
 from app.utils.system_utils import get_raw_cli_args, is_frozen
 
 
@@ -51,6 +52,7 @@ async def main():
         report_base_dir=args.report_base_dir,
         report_zip=args.report_zip,
         report_file=args.report_file,
+        system_name=await get_system_name(),
     )
 
     # --- Launch Application Mode ---

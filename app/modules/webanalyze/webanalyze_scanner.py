@@ -1,6 +1,8 @@
+import pathlib
 from typing import List
 
-from app.core.paths import TOOLS_LINUX_WEBANALYZE_PATH, WEBANALYZE_PATH
+import app.utils.paths_getter as paths_getter
+from app.core.paths import WEBANALYZE_PATH
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.webanalyze.webanalyze_parser import parse_webanalyze
@@ -9,17 +11,18 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def webanalyze_scan(
-    hosts: List[Host],
+        hosts: List[Host],
 ) -> None:
     """Executes a technology detection scan on the provided list of urls/domains/ips using Webanalyze."""
-
     await write_hosts_to_file(
         hosts=hosts,
         file=WEBANALYZE_PATH,
     )
 
+    webanalyze_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.NUCLEI.value.lower()]
+
     command = [
-        str(TOOLS_LINUX_WEBANALYZE_PATH),
+        str(webanalyze_path),
         "-hosts",
         str(WEBANALYZE_PATH),
         "-output",
