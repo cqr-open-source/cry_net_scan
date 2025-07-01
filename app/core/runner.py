@@ -11,6 +11,7 @@ from app.models.scan_config import ScanConfig
 from app.modules.afrog.afrog_scanner import afrog_scan
 from app.modules.nuclei.nuclei_scanner import nuclei_scan
 from app.modules.rustscan.rustscan_scanner import rustscan_scan
+from app.modules.smb_enumerator.smb_enumeration_scanner import smb_enumeration_scan
 from app.modules.webanalyze.webanalyze_scanner import webanalyze_scan
 from app.utils.chmod_adder import make_executable
 from app.utils.target_parser import parse_targets
@@ -44,6 +45,7 @@ async def run_tool(scan_config: ScanConfig) -> None:
 
     await asyncio.gather(*tasks)
 
+    # --- [START] TOOLS RUNNER [START] ---
     # Identify live hosts, open ports, and associated services.
     await rustscan_scan(
         all_hosts=all_hosts,
@@ -67,6 +69,11 @@ async def run_tool(scan_config: ScanConfig) -> None:
             hosts=live_hosts,
         )
 
+    # Scans SMB, RPC, NetBIOS, users.
+    await smb_enumeration_scan(
+        hosts=live_hosts,
+    )
+
     # Executes a vulnerability scan on the provided list of hosts.
     if not scan_config.disable_afrog:
         await afrog_scan(
@@ -77,6 +84,7 @@ async def run_tool(scan_config: ScanConfig) -> None:
     #     await rustscan_scan(host=host)
 
     # TODO: continue...
+    # --- [END] TOOLS RUNNER [END] ---
 
     # Save the results to the specified format and location
     await save_data(
@@ -88,5 +96,4 @@ async def run_tool(scan_config: ScanConfig) -> None:
     )
 
     await delete_temp_files()
-
     return None

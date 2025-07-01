@@ -7,4 +7,6 @@ class ScannerName(str, Enum):
 
     AFROG = "Afrog"
     NUCLEI = "Nuclei"
+
+    SMB_ENUMERATION = "SMB Enumeration"
     # NULLINUX = "NullLinux"

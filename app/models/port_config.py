@@ -2,6 +2,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
+from app.models.smb_enumeration_config import SmbEnumeration
 from app.models.vulnerability_config import Vulnerability
 
 
@@ -23,5 +24,11 @@ class Port(BaseModel):
     )
 
     vulnerabilities: List[Vulnerability] = Field(
-        default_factory=list, description="List of vulnerabilities."
+        default_factory=list,
+        description="List of vulnerabilities.",
+    )
+
+    smb_enumeration_data: List[SmbEnumeration] = Field(
+        default=None,
+        description="Detailed SMB enumeration findings (shares, users, groups, policies, etc.) from smb_enum_module.py."
     )

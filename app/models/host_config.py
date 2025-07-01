@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from app.models.application_config import Application
 from app.models.port_config import Port
+from app.models.smb_enumeration_config import SmbEnumeration
 from app.models.target_type_config import TargetType
 from app.models.technology_config import Technology
 from app.models.vulnerability_config import Vulnerability
@@ -45,6 +46,11 @@ class Host(BaseModel):
     # --- Vulnerabilities (from Afrog) ---
     vulnerabilities: List[Vulnerability] = Field(
         default_factory=list, description="List of vulnerabilities."
+    )
+
+    smb_enumeration_data: List[SmbEnumeration] = Field(
+        default=None,
+        description="Detailed SMB enumeration findings (shares, users, groups, policies, etc.) from smb_enum_module.py."
     )
 
     # services: List[Dict[str, Any]] = Field(
