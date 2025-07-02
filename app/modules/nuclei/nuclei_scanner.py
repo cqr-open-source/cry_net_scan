@@ -11,7 +11,7 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def nuclei_scan(
-        hosts: List[Host],
+    hosts: List[Host],
 ) -> None:
     """Executes a vulnerability scan on the provided list of hosts using the Nuclei scanner.
     Target: list of IPs with HTTP ports."""
@@ -39,7 +39,9 @@ async def nuclei_scan(
     # return None
     # [END] If we need to fast check!
 
-    nuclei_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.NUCLEI.value.lower()]
+    nuclei_path: pathlib.Path = paths_getter.TOOLS_PATHS[
+        ScannerName.NUCLEI.value.lower()
+    ]
 
     command = [
         str(nuclei_path),

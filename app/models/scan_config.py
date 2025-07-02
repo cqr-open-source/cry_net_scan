@@ -46,5 +46,4 @@ class ScanConfig(BaseModel):
         ..., description="Pack the report-related files into a ZIP archive."
     )
 
-    system_name: SystemName = Field(...,
-                                    description="Detect the system name.")
+    system_name: SystemName = Field(..., description="Detect the system name.")

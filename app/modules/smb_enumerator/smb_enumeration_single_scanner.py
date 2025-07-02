@@ -9,10 +9,10 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def _run_single_smb_scan(
-        host: Host,
-        # target_ip: str,
-        script_path: str,
-        scanner_name: ScannerName,
+    host: Host,
+    # target_ip: str,
+    script_path: str,
+    scanner_name: ScannerName,
 ) -> Dict[str, Any] | None:
     """
     Runs the smb_enum_module.py script for a single target IP address.
@@ -30,7 +30,8 @@ async def _run_single_smb_scan(
 
         if not stdout_decoded:  # subprocess_run returns empty string on error
             logger.error(
-                f"{scanner_name} subprocess for {target_ip} returned empty output, indicating an error.")
+                f"{scanner_name} subprocess for {target_ip} returned empty output, indicating an error."
+            )
             return
 
         await parse_smb_enumeration(
@@ -41,4 +42,6 @@ async def _run_single_smb_scan(
         )
 
     except Exception as e:
-        logger.error(f"An unexpected error occurred during {scanner_name} for {target_ip}: {e}")
+        logger.error(
+            f"An unexpected error occurred during {scanner_name} for {target_ip}: {e}"
+        )

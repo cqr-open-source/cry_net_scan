@@ -5,8 +5,8 @@ from app.models.system_config import SystemName
 
 
 async def make_executable(
-        tool_path: str,
-        system_name: SystemName,
+    tool_path: str,
+    system_name: SystemName,
 ) -> None:
     if system_name is SystemName.WINDOWS:
         return None
@@ -15,9 +15,11 @@ async def make_executable(
     logger = logging.getLogger(__name__)
 
     chmod_process = await asyncio.create_subprocess_exec(
-        "chmod", "+x", f"{tool_path}",
+        "chmod",
+        "+x",
+        f"{tool_path}",
         stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+        stderr=asyncio.subprocess.PIPE,
     )
     stdout_bytes, stderr_bytes = await chmod_process.communicate()
 

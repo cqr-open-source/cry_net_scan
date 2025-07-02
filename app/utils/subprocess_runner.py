@@ -2,10 +2,12 @@ import asyncio
 import logging
 from typing import List
 
+from app.core.paths import ROOT_PATH
+
 
 async def subprocess_run(
-        command: List[str],
-        module_name: str,
+    command: List[str],
+    module_name: str,
 ) -> str:
     logger = logging.getLogger(__name__)
 
@@ -13,7 +15,10 @@ async def subprocess_run(
 
     try:
         process = await asyncio.create_subprocess_exec(
-            *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=str(ROOT_PATH),
         )
 
         stdout_bytes, stderr_bytes = await process.communicate()

@@ -14,7 +14,7 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def afrog_scan(
-        hosts: List[Host],
+    hosts: List[Host],
 ) -> None:
     """
     Executes an `afrog` vulnerability scan against provided hosts.
@@ -29,7 +29,9 @@ async def afrog_scan(
         file=HOSTS_PATH,
     )
 
-    afrog_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.NUCLEI.value.lower()]
+    afrog_path: pathlib.Path = paths_getter.TOOLS_PATHS[
+        ScannerName.NUCLEI.value.lower()
+    ]
 
     command = [
         str(afrog_path),

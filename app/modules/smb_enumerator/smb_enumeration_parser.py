@@ -8,10 +8,10 @@ from app.models.smb_enumeration_config import SmbEnumeration, SmbContent
 
 
 async def parse_smb_enumeration(
-        stdout_decoded: str,
-        host: Host,
-        target_ip: str,
-        scanner_name: ScannerName,
+    stdout_decoded: str,
+    host: Host,
+    target_ip: str,
+    scanner_name: ScannerName,
 ) -> None:
     logger = logging.getLogger(__name__)
 
@@ -29,33 +29,39 @@ async def parse_smb_enumeration(
             if key != "smb_shares_detailed":
                 result = finding.get("data", {}).get("message", "")
 
-                results.append(SmbEnumeration(
-                    name=key,
-                    result=result,
-                ))
+                results.append(
+                    SmbEnumeration(
+                        name=key,
+                        result=result,
+                    )
+                )
 
             else:
 
                 for data in finding.get("data", {}):
-                    contents: List[SmbContent|None] = []
+                    contents: List[SmbContent | None] = []
 
                     name = data.get("name", "")
                     remark = data.get("remark", "")
                     permission_status = data.get("permission_status", "")
 
                     for content in data.get("contents", []):
-                        contents.append(SmbContent(
-                            type=content.get("type", ""),
-                            name=content.get("name", ""),
-                            size=content.get("size", 0),
-                        ))
+                        contents.append(
+                            SmbContent(
+                                type=content.get("type", ""),
+                                name=content.get("name", ""),
+                                size=content.get("size", 0),
+                            )
+                        )
 
-                    results.append(SmbEnumeration(
-                        name=name,
-                        remark=remark,
-                        permission_status=permission_status,
-                        contents=contents,
-                    ))
+                    results.append(
+                        SmbEnumeration(
+                            name=name,
+                            remark=remark,
+                            permission_status=permission_status,
+                            contents=contents,
+                        )
+                    )
 
     smb_port = smb_results.get("port", {})
 
@@ -68,7 +74,9 @@ async def parse_smb_enumeration(
 
         if found_port_object:
             found_port_object.smb_enumeration_data = results
-            logger.info(f"Attached {scanner_name} data to existing Port {smb_port} for {target_ip}.")
+            logger.info(
+                f"Attached {scanner_name} data to existing Port {smb_port} for {target_ip}."
+            )
         else:
             host.smb_enumeration_data = results
 

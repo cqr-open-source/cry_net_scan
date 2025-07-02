@@ -30,5 +30,5 @@ class Port(BaseModel):
 
     smb_enumeration_data: List[SmbEnumeration] = Field(
         default=None,
-        description="Detailed SMB enumeration findings (shares, users, groups, policies, etc.) from smb_enum_module.py."
+        description="Detailed SMB enumeration findings (shares, users, groups, policies, etc.) from smb_enum_module.py.",
     )

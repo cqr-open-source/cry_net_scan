@@ -15,10 +15,17 @@ def get_paths(system_name: SystemName):
 
     global TOOLS_PATHS
     TOOLS_PATHS = {
-        "rustscan": tools_system_path.joinpath(ScannerName.RUSTSCAN.value.lower(), ScannerName.RUSTSCAN.value.lower()),
+        "rustscan": tools_system_path.joinpath(
+            ScannerName.RUSTSCAN.value.lower(), ScannerName.RUSTSCAN.value.lower()
+        ),
         # "nmap": tools_system_path.joinpath(ScannerName.NMAP.value.lower(), ScannerName.NMAP.value.lower()),
-        "webanalyze": tools_system_path.joinpath(ScannerName.WEBANALYZE.value.lower(),
-                                                 ScannerName.WEBANALYZE.value.lower()),
-        "nuclei": tools_system_path.joinpath(ScannerName.NUCLEI.value.lower(), ScannerName.NUCLEI.value.lower()),
-        "afrog": tools_system_path.joinpath(ScannerName.AFROG.value.lower(), ScannerName.AFROG.value.lower()),
+        "webanalyze": tools_system_path.joinpath(
+            ScannerName.WEBANALYZE.value.lower(), ScannerName.WEBANALYZE.value.lower()
+        ),
+        "nuclei": tools_system_path.joinpath(
+            ScannerName.NUCLEI.value.lower(), ScannerName.NUCLEI.value.lower()
+        ),
+        "afrog": tools_system_path.joinpath(
+            ScannerName.AFROG.value.lower(), ScannerName.AFROG.value.lower()
+        ),
     }

@@ -11,7 +11,7 @@ from app.utils.subprocess_runner import subprocess_run
 
 
 async def webanalyze_scan(
-        hosts: List[Host],
+    hosts: List[Host],
 ) -> None:
     """Executes a technology detection scan on the provided list of urls/domains/ips using Webanalyze."""
     await write_hosts_to_file(
@@ -19,7 +19,9 @@ async def webanalyze_scan(
         file=WEBANALYZE_PATH,
     )
 
-    webanalyze_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.NUCLEI.value.lower()]
+    webanalyze_path: pathlib.Path = paths_getter.TOOLS_PATHS[
+        ScannerName.WEBANALYZE.value.lower()
+    ]
 
     command = [
         str(webanalyze_path),
