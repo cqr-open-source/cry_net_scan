@@ -20,6 +20,7 @@ TOOLS_WINDOWS_PATH = TOOLS_PATH.joinpath("windows")
 TOOLS_MACOS_PATH = TOOLS_PATH.joinpath("macos")
 
 TOOLS_SMB_PATH = TOOLS_PATH.joinpath("smb_enumeration", "main.py")
+TOOLS_AUTH_PATH = TOOLS_PATH.joinpath("auth", "main.py")
 
 # TOOLS_RUSTSCAN_PATH = TOOLS_LINUX_PATH.joinpath("rustscan", "rustscan")
 # TOOLS_NMAP_PATH = TOOLS_LINUX_PATH.joinpath("nmap", "nmap")

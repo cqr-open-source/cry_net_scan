@@ -9,6 +9,7 @@ from app.models.application_config import Application
 from app.models.host_config import Host
 from app.models.scan_config import ScanConfig
 from app.modules.afrog.afrog_scanner import afrog_scan
+from app.modules.auth_scan.auth_scanner import auth_scan
 from app.modules.nuclei.nuclei_scanner import nuclei_scan
 from app.modules.rustscan.rustscan_scanner import rustscan_scan
 from app.modules.smb_enumerator.smb_enumeration_scanner import smb_enumeration_scan
@@ -63,16 +64,21 @@ async def run_tool(scan_config: ScanConfig) -> None:
         hosts=live_hosts,
     )
 
-    # Executes a vulnerability scan on the provided list of hosts with ports.
-    if not scan_config.disable_nuclei:
-        await nuclei_scan(
-            hosts=live_hosts,
-        )
+    # Manages unauthorized access scans.
+    await auth_scan(
+        hosts=live_hosts,
+    )
 
     # Scans SMB, RPC, NetBIOS, users.
     await smb_enumeration_scan(
         hosts=live_hosts,
     )
+
+    # Executes a vulnerability scan on the provided list of hosts with ports.
+    if not scan_config.disable_nuclei:
+        await nuclei_scan(
+            hosts=live_hosts,
+        )
 
     # Executes a vulnerability scan on the provided list of hosts.
     if not scan_config.disable_afrog:

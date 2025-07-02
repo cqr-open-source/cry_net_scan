@@ -9,4 +9,5 @@ class ScannerName(str, Enum):
     NUCLEI = "Nuclei"
 
     SMB_ENUMERATION = "SMB Enumeration"
+    AUTH = "Auth"
     # NULLINUX = "NullLinux"

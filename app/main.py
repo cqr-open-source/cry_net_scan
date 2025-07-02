@@ -27,7 +27,7 @@ async def main():
         # If GUI is NOT requested AND targets ARE provided, it's CLI mode.
         pass
     elif not args.gui and not args.target and not await is_frozen():
-        # Scenario 3: Python script run with no arguments (e.g., `python main.py`).
+        # Scenario 3: A Python script runs with no arguments (e.g., `python main.py`).
         # We'll also default this to GUI.
         args.gui = True
 
