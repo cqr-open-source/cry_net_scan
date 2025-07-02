@@ -40,7 +40,9 @@ def generate_report(findings: List[Finding], show_details=True) -> None:
             logging.info(f"Host: {host}")
             for vuln in host_vulns:
                 cve_info = f"({vuln.cve})" if vuln.cve else ""
-                logging.info(f"{vuln.service} (Port {vuln.port}) - {vuln.severity}{cve_info}")
+                logging.info(
+                    f"{vuln.service} (Port {vuln.port}) - {vuln.severity}{cve_info}"
+                )
                 logging.info(f"Description: {vuln.description}")
                 logging.info(f"Remediation: {vuln.remediation}")
                 logging.info(f"Detection: {vuln.detection_method}")

@@ -6,7 +6,9 @@ from typing import List
 from tools.auth.host_scanner import scan_host
 
 
-def scan_multiple_hosts(ip_list, ports, threads=10, services_filter=None, timeout=2, grab_banners=True) -> List:
+def scan_multiple_hosts(
+    ip_list, ports, threads=10, services_filter=None, timeout=2, grab_banners=True
+) -> List:
     """Scan multiple hosts using threading."""
     all_findings = []
 

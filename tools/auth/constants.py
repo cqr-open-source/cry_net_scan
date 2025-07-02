@@ -7,15 +7,16 @@ FINDINGS = {
         "severity": "High",
         "description": "Exposed REST API allows unauthorized access.",
         "remediation": "Restrict access, enable x-pack security.",
-        "cve": "CVE-2015-5531"},
-
+        "cve": "CVE-2015-5531",
+    },
     "MongoDB": {
         "port": 27017,
         "name": "Default Unauthenticated Access",
         "severity": "High",
         "description": "Default installation allows unauthenticated DB access.",
-        "remediation": "Enable authentication and IP binding.", "cve": "CVE-2017-15135"},
-
+        "remediation": "Enable authentication and IP binding.",
+        "cve": "CVE-2017-15135",
+    },
     "Redis": {
         "port": 6379,
         "name": "No Password by Default",
@@ -24,7 +25,6 @@ FINDINGS = {
         "remediation": "Configure `requirepass` and bind to localhost.",
         "cve": None,
     },
-
     "Memcached": {
         "port": 11211,
         "name": "Exposed Cache Vulnerability",
@@ -33,14 +33,14 @@ FINDINGS = {
         "remediation": "Use firewall or bind to localhost.",
         "cve": "CVE-2018-1000115",
     },
-
     "CouchDB": {
         "port": 5984,
         "severity": "High",
         "name": "Unauthenticated HTTP Interface",
         "description": "No auth_scan on HTTP interface allows DB enumeration.",
-        "remediation": "Enable admin users and validate IP access.", "cve": "CVE-2017-12635"},
-
+        "remediation": "Enable admin users and validate IP access.",
+        "cve": "CVE-2017-12635",
+    },
     "Cassandra": {
         "port": 9042,
         "name": "Open Database Default Config",
@@ -49,17 +49,14 @@ FINDINGS = {
         "remediation": "Enable password auth_scan and IP filter.",
         "cve": None,
     },
-
     "RethinkDB": {
         "port": 8080,
         "name": "Exposed Admin UI",
         "severity": "High",
         "description": "RethinkDB admin UI exposed with no auth_scan.",
-
         "remediation": "Bind to localhost and use Nginx auth_scan.",
         "cve": None,
     },
-
     "InfluxDB": {
         "port": 8086,
         "name": "Unauthenticated Time Series DB",
@@ -68,7 +65,6 @@ FINDINGS = {
         "remediation": "Enable authentication and HTTPS.",
         "cve": "CVE-2019-20933",
     },
-
     # Infrastructure - Default/No Auth
     "Docker API": {
         "port": 2375,
@@ -78,7 +74,6 @@ FINDINGS = {
         "remediation": "Use TLS and bind to localhost.",
         "cve": "CVE-2019-5736",
     },
-
     "Docker Registry": {
         "port": 5000,
         "severity": "High",
@@ -87,7 +82,6 @@ FINDINGS = {
         "remediation": "Enable authentication.",
         "cve": None,
     },
-
     "Kubernetes API": {
         "port": 8080,
         "severity": "Critical",
@@ -96,7 +90,6 @@ FINDINGS = {
         "remediation": "Use secure port 6443 with auth_scan.",
         "cve": "CVE-2020-8559",
     },
-
     "Kubernetes Dashboard": {
         "port": 9090,
         "severity": "High",
@@ -105,7 +98,6 @@ FINDINGS = {
         "remediation": "Enable authentication and RBAC.",
         "cve": None,
     },
-
     "Consul": {
         "port": 8500,
         "severity": "High",
@@ -114,7 +106,6 @@ FINDINGS = {
         "remediation": "Enable ACLs and restrict access.",
         "cve": None,
     },
-
     "Etcd": {
         "port": 2379,
         "severity": "High",
@@ -123,7 +114,6 @@ FINDINGS = {
         "remediation": "Enable authentication and access control.",
         "cve": "CVE-2021-28235",
     },
-
     "Zookeeper": {
         "port": 2181,
         "severity": "High",
@@ -132,16 +122,15 @@ FINDINGS = {
         "remediation": "Enable SASL auth_scan and ACLs.",
         "cve": "CVE-2019-0201",
     },
-
     # Web Applications - Default Creds/No Auth
     "Jenkins": {
-        "port": 8080, "severity": "High",
+        "port": 8080,
+        "severity": "High",
         "name": "Script Execution via Open Dashboard",
         "description": "Allows script execution via open dashboard.",
         "remediation": "Enable auth_scan, disable CLI if unused.",
         "cve": "CVE-2019-1003000",
     },
-
     "SonarQube": {
         "port": 9000,
         "severity": "High",
@@ -150,7 +139,6 @@ FINDINGS = {
         "remediation": "Require authentication and rotate tokens.",
         "cve": "CVE-2020-27986",
     },
-
     "Kibana": {
         "port": 5601,
         "severity": "High",
@@ -159,7 +147,6 @@ FINDINGS = {
         "remediation": "Add x-pack or reverse proxy with login.",
         "cve": "CVE-2019-7609",
     },
-
     "Grafana": {
         "port": 3000,
         "severity": "Medium",
@@ -168,7 +155,6 @@ FINDINGS = {
         "remediation": "Reset admin password, enable login auth_scan.",
         "cve": "CVE-2019-15043",
     },
-
     "GitLab": {
         "port": 80,
         "severity": "High",
@@ -177,7 +163,6 @@ FINDINGS = {
         "remediation": "Restrict access and enforce login.",
         "cve": "CVE-2021-22205",
     },
-
     "PhpMyAdmin": {
         "port": 80,
         "severity": "High",
@@ -186,7 +171,6 @@ FINDINGS = {
         "remediation": "Restrict IPs and enable login.",
         "cve": "CVE-2009-1151",
     },
-
     "Jupyter Notebook": {
         "port": 8888,
         "severity": "Critical",
@@ -195,7 +179,6 @@ FINDINGS = {
         "remediation": "Require token or password auth_scan.",
         "cve": "CVE-2018-20460",
     },
-
     "Apache Tomcat Manager": {
         "port": 8080,
         "severity": "High",
@@ -204,7 +187,6 @@ FINDINGS = {
         "remediation": "Change default passwords, restrict access.",
         "cve": "CVE-2020-1938",
     },
-
     "WebLogic Console": {
         "port": 7001,
         "severity": "Critical",
@@ -213,7 +195,6 @@ FINDINGS = {
         "remediation": "Enable login and patch regularly.",
         "cve": "CVE-2020-14882",
     },
-
     "Sonatype Nexus": {
         "port": 8081,
         "severity": "High",
@@ -222,15 +203,14 @@ FINDINGS = {
         "remediation": "Enable authentication and limit access.",
         "cve": "CVE-2020-10199",
     },
-
     "Rundeck": {
-        "port": 4440, "severity": "High",
+        "port": 4440,
+        "severity": "High",
         "name": "Exposed Web GUI",
         "description": "Web GUI exposed without auth_scan.",
         "remediation": "Enable ACLs and login access.",
         "cve": "CVE-2020-25310",
     },
-
     "Portainer": {
         "port": 9000,
         "severity": "High",
@@ -239,7 +219,6 @@ FINDINGS = {
         "remediation": "Enable authentication.",
         "cve": None,
     },
-
     "cAdvisor": {
         "port": 8080,
         "severity": "Medium",
@@ -248,7 +227,6 @@ FINDINGS = {
         "remediation": "Restrict access or disable.",
         "cve": None,
     },
-
     # Message Queues - Default Auth
     "RabbitMQ": {
         "port": 15672,
@@ -256,27 +234,24 @@ FINDINGS = {
         "name": "Exposed Dashboard with Default Credentials",
         "description": "Exposed dashboard with guest/guest login.",
         "remediation": "Delete guest user or use firewall rules.",
-        "cve": None
+        "cve": None,
     },
-
     "Apache Kafka": {
         "port": 9092,
         "severity": "High",
         "name": "Unauthenticated Kafka Broker",
         "description": "Kafka broker without authentication.",
         "remediation": "Enable SASL authentication.",
-        "cve": None
+        "cve": None,
     },
-
     "Apache ActiveMQ": {
         "port": 8161,
         "severity": "High",
         "name": "Web Console with Default Credentials",
         "description": "Web console with admin/admin creds.",
         "remediation": "Change default credentials.",
-        "cve": "CVE-2016-3088"
+        "cve": "CVE-2016-3088",
     },
-
     # Monitoring - No Auth
     "Prometheus": {
         "port": 9090,
@@ -284,36 +259,32 @@ FINDINGS = {
         "name": "Publicly Exposed Metrics",
         "description": "Metrics exposed publicly with no login.",
         "remediation": "Use reverse proxy with auth or firewall.",
-        "cve": None
+        "cve": None,
     },
-
     "Node Exporter": {
         "port": 9100,
         "severity": "Medium",
         "name": "Exposed System Metrics",
         "description": "System metrics exposed without auth.",
         "remediation": "Restrict access with firewall.",
-        "cve": None
+        "cve": None,
     },
-
     "Alertmanager": {
         "port": 9093,
         "severity": "Medium",
         "name": "Unauthenticated Alert Management",
         "description": "Alert management without auth.",
         "remediation": "Enable authentication.",
-        "cve": None
+        "cve": None,
     },
-
     "Splunk": {
         "port": 8000,
         "severity": "Medium",
         "name": "Default Admin Credentials",
         "description": "Splunk web with admin/changeme creds.",
         "remediation": "Change default admin password.",
-        "cve": "CVE-2020-1427"
+        "cve": "CVE-2020-1427",
     },
-
     # Network Services - Anonymous Access
     "FTP Anonymous": {
         "port": 21,
@@ -321,7 +292,7 @@ FINDINGS = {
         "name": "Anonymous File Access via FTP",
         "description": "Allows anonymous file access.",
         "remediation": "Disable anonymous login.",
-        "cve": None
+        "cve": None,
     },
     "Telnet": {
         "port": 23,
@@ -329,7 +300,7 @@ FINDINGS = {
         "name": "No Encryption or Authentication",
         "description": "No encryption or authentication used.",
         "remediation": "Disable and use SSH instead.",
-        "cve": None
+        "cve": None,
     },
     "TFTP": {
         "port": 69,
@@ -337,7 +308,7 @@ FINDINGS = {
         "name": "No Credentials for Upload/Download",
         "description": "No credentials for upload/download.",
         "remediation": "Disable or firewall access.",
-        "cve": None
+        "cve": None,
     },
     "SNMP": {
         "port": 161,
@@ -345,7 +316,7 @@ FINDINGS = {
         "name": "Community Strings Exposed",
         "description": "Community strings public/private exposed.",
         "remediation": "Use SNMPv3 with strong auth.",
-        "cve": "CVE-2017-6736"
+        "cve": "CVE-2017-6736",
     },
     "LDAP Anonymous": {
         "port": 389,
@@ -353,7 +324,7 @@ FINDINGS = {
         "name": "Anonymous Bind Information Leak",
         "description": "Anonymous bind may leak directory structure.",
         "remediation": "Require authenticated bind for all queries.",
-        "cve": "CVE-2017-8563"
+        "cve": "CVE-2017-8563",
     },
     "SMB Guest": {
         "port": 445,
@@ -361,7 +332,7 @@ FINDINGS = {
         "name": "Guest Access Enabled",
         "description": "Guest access enabled, allows file Browse.",
         "remediation": "Disable guest shares, use strong ACLs.",
-        "cve": "CVE-2020-0796"
+        "cve": "CVE-2020-0796",
     },
     "NFS Open": {
         "port": 2049,
@@ -369,7 +340,7 @@ FINDINGS = {
         "name": "Unrestricted Directory Exports",
         "description": "Exports directories without restriction.",
         "remediation": "Use IP filtering and root_squash.",
-        "cve": None
+        "cve": None,
     },
     "Rsync": {
         "port": 873,
@@ -377,7 +348,7 @@ FINDINGS = {
         "name": "Exposed Rsync Module",
         "description": "Rsync exposed without module restrictions.",
         "remediation": "Disable anonymous modules or use auth.",
-        "cve": None
+        "cve": None,
     },
     "VNC No Auth": {
         "port": 5900,
@@ -385,9 +356,8 @@ FINDINGS = {
         "name": "VNC Server with No Password",
         "description": "VNC server with no password.",
         "remediation": "Set strong password, use encryption.",
-        "cve": "CVE-2019-15681"
+        "cve": "CVE-2019-15681",
     },
-
     # Web Exposures - Common Misconfigurations
     "Directory Listing": {
         "port": 80,
@@ -395,7 +365,7 @@ FINDINGS = {
         "name": "Enabled Directory Listing",
         "description": "Directory listing enabled on HTTP server.",
         "remediation": "Disable autoindex in web server config.",
-        "cve": None
+        "cve": None,
     },
     "Git Repository": {
         "port": 80,
@@ -403,7 +373,7 @@ FINDINGS = {
         "name": "Exposed Git Repository",
         "description": "Git repository exposed via web (.git/).",
         "remediation": "Remove .git directory from web root.",
-        "cve": None
+        "cve": None,
     },
     "SVN Repository": {
         "port": 3690,
@@ -411,7 +381,7 @@ FINDINGS = {
         "name": "Unauthenticated SVN Repository Access",
         "description": "SVN repository accessible without auth.",
         "remediation": "Enable authentication for SVN.",
-        "cve": None
+        "cve": None,
     },
     "Swagger UI": {
         "port": 80,
@@ -419,7 +389,7 @@ FINDINGS = {
         "name": "Publicly Exposed API Documentation",
         "description": "API documentation exposed publicly.",
         "remediation": "Restrict access to documentation.",
-        "cve": None
+        "cve": None,
     },
     "phpinfo()": {
         "port": 80,
@@ -427,7 +397,7 @@ FINDINGS = {
         "name": "PHP Configuration Exposed",
         "description": "PHP configuration exposed via phpinfo().",
         "remediation": "Remove phpinfo() files.",
-        "cve": None
+        "cve": None,
     },
     "Server Status": {
         "port": 80,
@@ -435,7 +405,7 @@ FINDINGS = {
         "name": "Exposed Server Status Page",
         "description": "Apache server-status page exposed.",
         "remediation": "Disable server-status or restrict access.",
-        "cve": None
+        "cve": None,
     },
     "Backup Files": {
         "port": 80,
@@ -443,7 +413,7 @@ FINDINGS = {
         "name": "Accessible Backup Files",
         "description": "Backup files accessible via web (.bak, .sql).",
         "remediation": "Remove backup files from web directory.",
-        "cve": None
+        "cve": None,
     },
     "Config Files": {
         "port": 80,
@@ -451,59 +421,57 @@ FINDINGS = {
         "name": "Exposed Configuration Files",
         "description": "Configuration files exposed (.env, config.php).",
         "remediation": "Secure configuration files.",
-        "cve": None
-    }
+        "cve": None,
+    },
 }
 
 # Enhanced banner patterns for better service identification
 BANNER_PATTERNS = {
     # Databases
-    "Elasticsearch": [r'"cluster_name"', r'"tagline".*"You Know, for Search"', r'elasticsearch'],
-    "MongoDB": [r'MongoDB', r'db version', r'wire version'],
-    "Redis": [r'\+PONG', r'Redis server', r'-NOAUTH'],
+    "Elasticsearch": [
+        r'"cluster_name"',
+        r'"tagline".*"You Know, for Search"',
+        r"elasticsearch",
+    ],
+    "MongoDB": [r"MongoDB", r"db version", r"wire version"],
+    "Redis": [r"\+PONG", r"Redis server", r"-NOAUTH"],
     "CouchDB": [r'"couchdb":', r'"welcome":', r'"version":'],
-    "Cassandra": [r'Cassandra', r'Invalid or unsupported protocol version'],
-    "InfluxDB": [r'"X-Influxdb-Version"', r'influxdb'],
-
+    "Cassandra": [r"Cassandra", r"Invalid or unsupported protocol version"],
+    "InfluxDB": [r'"X-Influxdb-Version"', r"influxdb"],
     # Web Applications
-    "Jenkins": [r'Jenkins', r'X-Jenkins:', r'hudson'],
-    "SonarQube": [r'SonarQube', r'sonar'],
-    "Kibana": [r'"name":"kibana"', r'kbn-name', r'kibana'],
-    "Grafana": [r'"title":"Grafana"', r'grafana'],
-    "GitLab": [r'GitLab', r'gitlab'],
-    "PhpMyAdmin": [r'phpMyAdmin', r'pma_'],
-    "Jupyter": [r'jupyter', r'IPython', r'notebook'],
-    "Tomcat": [r'Apache-Coyote', r'Tomcat', r'tomcat'],
-    "WebLogic": [r'WebLogic', r'oracle'],
-    "Nexus": [r'Nexus', r'sonatype'],
-    "Rundeck": [r'Rundeck', r'rundeck'],
-    "Portainer": [r'Portainer', r'portainer'],
-
+    "Jenkins": [r"Jenkins", r"X-Jenkins:", r"hudson"],
+    "SonarQube": [r"SonarQube", r"sonar"],
+    "Kibana": [r'"name":"kibana"', r"kbn-name", r"kibana"],
+    "Grafana": [r'"title":"Grafana"', r"grafana"],
+    "GitLab": [r"GitLab", r"gitlab"],
+    "PhpMyAdmin": [r"phpMyAdmin", r"pma_"],
+    "Jupyter": [r"jupyter", r"IPython", r"notebook"],
+    "Tomcat": [r"Apache-Coyote", r"Tomcat", r"tomcat"],
+    "WebLogic": [r"WebLogic", r"oracle"],
+    "Nexus": [r"Nexus", r"sonatype"],
+    "Rundeck": [r"Rundeck", r"rundeck"],
+    "Portainer": [r"Portainer", r"portainer"],
     # Infrastructure
-    "Docker": [r'"ApiVersion"', r'docker'],
-    "Consul": [r'"Config":', r'consul'],
-    "Etcd": [r'"etcdserver"', r'etcd'],
-    "Zookeeper": [r'Zookeeper version', r'Environment:'],
-    "Kubernetes": [r'"major":', r'"minor":', r'kubernetes'],
-
+    "Docker": [r'"ApiVersion"', r"docker"],
+    "Consul": [r'"Config":', r"consul"],
+    "Etcd": [r'"etcdserver"', r"etcd"],
+    "Zookeeper": [r"Zookeeper version", r"Environment:"],
+    "Kubernetes": [r'"major":', r'"minor":', r"kubernetes"],
     # Message Queues
-    "RabbitMQ": [r'RabbitMQ', r'rabbit'],
-    "ActiveMQ": [r'ActiveMQ', r'activemq'],
-
+    "RabbitMQ": [r"RabbitMQ", r"rabbit"],
+    "ActiveMQ": [r"ActiveMQ", r"activemq"],
     # Monitoring
-    "Prometheus": [r'Prometheus', r'prometheus'],
-    "Splunk": [r'Splunk', r'splunkd'],
-
+    "Prometheus": [r"Prometheus", r"prometheus"],
+    "Splunk": [r"Splunk", r"splunkd"],
     # Network Services
-    "FTP": [r'220.*FTP', r'vsFTPd', r'ProFTPD', r'FileZilla'],
-    "Telnet": [r'login:', r'Username:', r'Welcome to'],
-    "SNMP": [r'SNMP', r'public', r'private'],
-    "VNC": [r'RFB ', r'VNC server'],
-
+    "FTP": [r"220.*FTP", r"vsFTPd", r"ProFTPD", r"FileZilla"],
+    "Telnet": [r"login:", r"Username:", r"Welcome to"],
+    "SNMP": [r"SNMP", r"public", r"private"],
+    "VNC": [r"RFB ", r"VNC server"],
     # Web Server Responses
-    "Apache": [r'Apache/', r'Server: Apache'],
-    "Nginx": [r'nginx/', r'Server: nginx'],
-    "IIS": [r'Microsoft-IIS', r'Server: Microsoft-IIS'],
+    "Apache": [r"Apache/", r"Server: Apache"],
+    "Nginx": [r"nginx/", r"Server: nginx"],
+    "IIS": [r"Microsoft-IIS", r"Server: Microsoft-IIS"],
 }
 
 # Web paths to check for unauthorized access
@@ -528,5 +496,5 @@ WEB_PATHS = {
     "Swagger UI": ["/swagger-ui/", "/swagger/", "/api-docs/"],
     "phpinfo()": ["/phpinfo.php", "/info.php", "/test.php"],
     "Server Status": ["/server-status", "/server-info"],
-    "Backup Files": ["/backup.sql", "/db.sql", "/config.bak"]
+    "Backup Files": ["/backup.sql", "/db.sql", "/config.bak"],
 }

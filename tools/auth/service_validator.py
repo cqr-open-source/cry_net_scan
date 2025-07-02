@@ -18,17 +18,23 @@ def validate_service(ip, port, service, timeout=2):
         # Database validations
         if service == "Elasticsearch":
             r = requests.get(f"http://{ip}:{port}", timeout=timeout)
-            if r.status_code == 200 and ('cluster_name' in r.text or 'elasticsearch' in r.text.lower()):
+            if r.status_code == 200 and (
+                "cluster_name" in r.text or "elasticsearch" in r.text.lower()
+            ):
                 # Check if authentication is required
                 try:
-                    search_r = requests.get(f"http://{ip}:{port}/_search", timeout=timeout)
+                    search_r = requests.get(
+                        f"http://{ip}:{port}/_search", timeout=timeout
+                    )
                     return search_r.status_code == 200  # No auth_scan required
                 except requests.exceptions.RequestException:
                     return True  # Assume open if _search fails but initial connection works (e.g. security enabled but no data)
 
         elif service == "MongoDB":
             try:
-                client = pymongo.MongoClient(ip, port, serverSelectionTimeoutMS=timeout * 1000)
+                client = pymongo.MongoClient(
+                    ip, port, serverSelectionTimeoutMS=timeout * 1000
+                )
                 client.server_info()  # This will fail if auth_scan is required
                 return True
             except pymongo.errors.OperationFailure:
@@ -58,7 +64,9 @@ def validate_service(ip, port, service, timeout=2):
             return r.status_code == 200  # Should require auth_scan
 
         elif service == "InfluxDB":
-            r = requests.get(f"http://{ip}:{port}/query?q=SHOW DATABASES", timeout=timeout)
+            r = requests.get(
+                f"http://{ip}:{port}/query?q=SHOW DATABASES", timeout=timeout
+            )
             return r.status_code == 200
 
         elif service == "Cassandra":
@@ -75,20 +83,31 @@ def validate_service(ip, port, service, timeout=2):
             for path in WEB_PATHS[service]:
                 try:
                     protocol = "https" if port in [443, 8443] else "http"
-                    r = requests.get(f"{protocol}://{ip}:{port}{path}", timeout=timeout, verify=False,
-                                     allow_redirects=False)
+                    r = requests.get(
+                        f"{protocol}://{ip}:{port}{path}",
+                        timeout=timeout,
+                        verify=False,
+                        allow_redirects=False,
+                    )
 
                     # Check for successful access without auth_scan
                     if r.status_code in [200, 301, 302]:
                         # Additional checks for specific services
                         if service == "Jenkins" and "jenkins" in r.text.lower():
                             return "login" not in r.text.lower()  # No login required
-                        elif service == "Grafana" and r.status_code == 200 and path == "/":
+                        elif (
+                            service == "Grafana"
+                            and r.status_code == 200
+                            and path == "/"
+                        ):
                             return "login" not in r.text.lower()
                         elif service == "RabbitMQ" and path == "/api/overview":
                             return r.status_code == 200  # Should require auth_scan
                         elif service == "Git Repository" and path == "/.git/config":
-                            return "[core]" in r.text or "repositoryformatversion" in r.text
+                            return (
+                                "[core]" in r.text
+                                or "repositoryformatversion" in r.text
+                            )
                         elif service == "Directory Listing" and "Index of" in r.text:
                             return True
                         elif service == "phpinfo()" and "PHP Version" in r.text:
@@ -120,10 +139,10 @@ def validate_service(ip, port, service, timeout=2):
 
         elif service == "Zookeeper":
             sock = socket.create_connection((ip, port), timeout=timeout)
-            sock.sendall(b'stat\n')
+            sock.sendall(b"stat\n")
             response = sock.recv(1024)
             sock.close()
-            return b'Mode' in response or b'Zookeeper' in response
+            return b"Mode" in response or b"Zookeeper" in response
 
         # Network service validations
         elif service == "FTP Anonymous":
@@ -153,7 +172,7 @@ def validate_service(ip, port, service, timeout=2):
                 sock = socket.create_connection((ip, port), timeout=timeout)
                 data = sock.recv(12)  # RFB version
                 sock.close()
-                return b'RFB' in data
+                return b"RFB" in data
             except socket.error:
                 return False
 

@@ -16,7 +16,7 @@ def save_results(findings, filename=None, format_type="csv") -> None:
         fieldnames: List[str] = list(Finding.model_fields.keys())
 
         if filename:
-            with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+            with open(filename, "w", newline="", encoding="utf-8") as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writeheader()
                 for finding in findings:
@@ -24,7 +24,9 @@ def save_results(findings, filename=None, format_type="csv") -> None:
             logging.info(f"Findings successfully saved to {filename} in CSV format.")
 
         else:
-            logging.info("CSV output not written to file. Printing dict representations:")
+            logging.info(
+                "CSV output not written to file. Printing dict representations:"
+            )
             for finding in findings:
                 print(finding.model_dump())
 
@@ -33,7 +35,7 @@ def save_results(findings, filename=None, format_type="csv") -> None:
         findings_dicts = [finding.model_dump() for finding in findings]
 
         if filename:
-            with open(filename, 'w', encoding='utf-8') as jsonfile:
+            with open(filename, "w", encoding="utf-8") as jsonfile:
                 json.dump(findings, jsonfile, indent=2, default=str)
             logging.info(f"Findings successfully saved to {filename} in JSON format.")
 

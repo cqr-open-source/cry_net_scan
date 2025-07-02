@@ -53,11 +53,17 @@ def scan_host(ip, ports, services_filter=None, timeout=2, grab_banners=True):
                         remediation=details["remediation"],
                         cve=details["cve"],
                         banner=banner[:300] if banner else "",
-                        detection_method=f"Banner: {identified_service}" if identified_service == service_name else "Port + Validation",
+                        detection_method=(
+                            f"Banner: {identified_service}"
+                            if identified_service == service_name
+                            else "Port + Validation"
+                        ),
                     )
 
                     findings.append(finding)
-                    logging.warning(f"UNAUTHORIZED ACCESS: {service_name} on {ip}:{port}")
+                    logging.warning(
+                        f"UNAUTHORIZED ACCESS: {service_name} on {ip}:{port}"
+                    )
                     break
 
     return findings
