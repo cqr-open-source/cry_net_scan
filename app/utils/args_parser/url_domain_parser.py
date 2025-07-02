@@ -60,7 +60,7 @@ async def parse_url_domain(
             logger.debug(
                 f"Skipping Application creation for IP-based URL: '{original_target}'"
             )
-            # Ensure Host object is created for this IP.
+            # Ensure a Host object is created for this IP.
             # This covers cases like http://192.168.1.1 or https://[::1]/
             await parse_single_ip(
                 target=hostname, unique_hosts_by_ip=unique_hosts_by_ip
@@ -77,9 +77,9 @@ async def parse_url_domain(
         # Resolve IPs for the valid hostname
         resolved_ips_for_domain = await get_all_ips(hostname)
 
-        # Determine target type for the Application based on the ORIGINAL target
+        # Determine a target type for the Application based on the ORIGINAL target
         app_target_type: TargetType
-        if "://" in original_target:  # Check original string for scheme
+        if "://" in original_target:  # Check the original string for a scheme
             app_target_type = TargetType.url
         else:
             app_target_type = TargetType.domain
@@ -129,6 +129,7 @@ async def parse_url_domain(
                         target=original_target,  # Store the original input string
                         target_type=host_original_target_type,
                         ip_address=ip_addr,
+                        associated_applications=[app_obj],
                     )
                     logger.debug(
                         f"Added host for original target '{original_target}' "

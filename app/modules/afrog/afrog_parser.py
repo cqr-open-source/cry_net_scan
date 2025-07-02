@@ -2,7 +2,6 @@ import logging
 from typing import List
 
 from app.models.host_config import Host
-from app.models.raw_http_exchange_config import RawHttpExchange
 from app.models.scanner_config import ScannerName
 from app.models.vulnerability_config import Vulnerability
 from app.modules.afrog.duplicate_finder import search_duplicate_vulnerabilities
@@ -22,21 +21,10 @@ async def parse_afrog(json_result: List, hosts: List[Host]) -> None:
             logger.warning(f"Host {target} not found in the provided hosts list.")
             continue
 
-        raw_http_exchange: List = []
-
-        for request_info in vulnerability_info.get("pocresult", []):
-            raw_http_exchange.append(
-                RawHttpExchange(
-                    request=request_info["request"],
-                    response=request_info["response"],
-                )
-            )
-
         vulnerability: Vulnerability = Vulnerability(
             template_id=vulnerability_info["pocinfo"]["id"],
             name=vulnerability_info["pocinfo"]["infoname"],
             severity=vulnerability_info["pocinfo"]["infoseg"],
-            raw_http_exchange=raw_http_exchange,
             finding_url=vulnerability_info["fulltarget"],
             scanner_name=ScannerName.AFROG.value,
         )

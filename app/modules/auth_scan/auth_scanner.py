@@ -1,7 +1,6 @@
 import asyncio
 from typing import List
 
-from app.core.paths import TOOLS_AUTH_PATH
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.auth_scan.auth_single_scanner import _run_single_auth_scan
@@ -21,7 +20,10 @@ async def auth_scan(
     scan_tasks = []
     for host in hosts:
         scan_tasks.append(
-            _run_single_auth_scan(host, str(TOOLS_AUTH_PATH), ScannerName.AUTH.value)
+            _run_single_auth_scan(
+                host=host,
+                scanner_name=ScannerName.AUTH.value,
+            )
         )
 
     # Run all scan tasks concurrently and collect results

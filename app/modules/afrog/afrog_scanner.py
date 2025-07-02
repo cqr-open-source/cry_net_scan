@@ -29,9 +29,7 @@ async def afrog_scan(
         file=HOSTS_PATH,
     )
 
-    afrog_path: pathlib.Path = paths_getter.TOOLS_PATHS[
-        ScannerName.NUCLEI.value.lower()
-    ]
+    afrog_path: pathlib.Path = paths_getter.TOOLS_PATHS[ScannerName.AFROG.value.lower()]
 
     command = [
         str(afrog_path),

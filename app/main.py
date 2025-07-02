@@ -12,15 +12,15 @@ from app.utils.system_utils import get_raw_cli_args, is_frozen
 
 async def main():
     raw_args = await get_raw_cli_args()
+    args: argparse.Namespace = await init_args()
 
     # --- Determine Initial Application Mode ---
     if await is_frozen() and not raw_args:
         # Scenario 1: Frozen executable run with no command-line arguments (double-click)
-        args: argparse.Namespace = await init_args()
         args.gui = True  # Force GUI mode if it's a binary click without arguments
-    else:
-        # Scenario 2: Command-line invocation (either with --gui or targets, or both)
-        args: argparse.Namespace = await init_args()
+    elif not await is_frozen() and not raw_args:
+        # Scenario 2: A Python script is run without arguments (e.g., `python main.py`)
+        args.gui = True
 
     # --- Override GUI mode if targets are provided and --gui is not explicitly set ---
     if not args.gui and args.target:

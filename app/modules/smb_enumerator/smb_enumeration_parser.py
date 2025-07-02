@@ -8,7 +8,7 @@ from app.models.smb_enumeration_config import SmbEnumeration, SmbContent
 
 
 async def parse_smb_enumeration(
-    stdout_decoded: str,
+    temp_result: str,
     host: Host,
     target_ip: str,
     scanner_name: ScannerName,
@@ -16,11 +16,11 @@ async def parse_smb_enumeration(
     logger = logging.getLogger(__name__)
 
     try:
-        smb_results = json.loads(stdout_decoded)
+        smb_results = json.loads(temp_result)
 
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse JSON output for {target_ip}: {e}")
-        logger.error(f"Raw stdout:\n{stdout_decoded}")
+        logger.error(f"Raw stdout:\n{temp_result}")
         return None
 
     results: List[SmbEnumeration | None] = []

@@ -1,4 +1,3 @@
-import json
 import logging
 from typing import List
 
@@ -9,7 +8,7 @@ from app.models.vulnerability_config import Vulnerability
 
 
 async def parse_auth(
-    result: str,
+    result: List,
     host: Host,
     scanner_name: ScannerName,
 ) -> None:
@@ -17,17 +16,9 @@ async def parse_auth(
 
     logger = logging.getLogger(__name__)
 
-    try:
-        result_json: List = json.loads(result)
-    except json.decoder.JSONDecodeError as e:
-        logger.error(
-            f"Failed to decode JSON from {scanner_name} for {host.ip_address}: {e}. Raw result: {result[:500]}..."
-        )
-        return None
+    logger.debug(f"Found {len(result)} vulnerabilities on {host.ip_address}")
 
-    logger.debug(f"Found {len(result_json)} vulnerabilities on {host.ip_address}")
-
-    for vulnerability_object in result_json:
+    for vulnerability_object in result:
         found_port: Port | None = None
         for port_obj in host.ports:
             if port_obj.port == vulnerability_object["port"]:

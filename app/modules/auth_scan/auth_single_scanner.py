@@ -1,15 +1,14 @@
 import logging
-import sys
+from typing import List
 
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.auth_scan.auth_parser import parse_auth
-from app.utils.subprocess_runner import subprocess_run
+from tools.auth.multiple_hosts_scanner import scan_multiple_hosts
 
 
 async def _run_single_auth_scan(
     host: Host,
-    script_path: str,
     scanner_name: ScannerName,
 ) -> None:
     """
@@ -20,27 +19,15 @@ async def _run_single_auth_scan(
     target_ip: str = host.ip_address
     ports: str = ",".join(str(port_.port) for port_ in host.ports)
 
-    try:
-        # Call the generic subprocess_run utility
-        stdout_decoded = await subprocess_run(
-            command=[
-                sys.executable,
-                script_path,
-                "-t",
-                target_ip,
-                "--format",
-                "json",
-                "-T",
-                "10",
-                "--ports",
-                ports,
-            ],
-            module_name=scanner_name,
-        )
+    results: List = scan_multiple_hosts(
+        ip_list=[target_ip],
+        ports=ports,
+    )
 
-        if stdout_decoded:
+    try:
+        if results:
             await parse_auth(
-                result=stdout_decoded,
+                result=results,
                 host=host,
                 scanner_name=scanner_name,
             )

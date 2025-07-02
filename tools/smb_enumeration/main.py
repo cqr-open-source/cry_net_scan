@@ -17,6 +17,8 @@ def main():
         json_output = run_smb_enumeration(target_ip)
         print(json_output)
 
+    sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

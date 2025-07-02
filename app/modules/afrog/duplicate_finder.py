@@ -29,7 +29,7 @@ async def search_duplicate_vulnerabilities(
                 ):
                     return True
 
-                # Last chance to check similarity
+                # A last chance to check similarity
                 if await is_similar_vuln(
                     name_1=vulnerability.name,
                     name_2=port_vulnerability.name,

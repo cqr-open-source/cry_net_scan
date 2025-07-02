@@ -1,7 +1,6 @@
 import asyncio
 from typing import List
 
-from app.core.paths import TOOLS_SMB_PATH
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.smb_enumerator.smb_enumeration_single_scanner import (
@@ -23,7 +22,8 @@ async def smb_enumeration_scan(
     for host in hosts:
         scan_tasks.append(
             _run_single_smb_scan(
-                host, str(TOOLS_SMB_PATH), ScannerName.SMB_ENUMERATION.value
+                host=host,
+                scanner_name=ScannerName.SMB_ENUMERATION.value,
             )
         )
 

@@ -34,9 +34,9 @@ NUCLEI_PATH = HOME_PATH.joinpath("nuclei.txt")  # full host
 # AFROG_TEMP_PATH = ROOT_PATH.joinpath("afrog.json")
 AFROG_TEMP_PATH = HOME_PATH.joinpath("afrog.json")
 
-LOG_PATH = ROOT_PATH.joinpath("logs")
+LOG_PATH = HOME_PATH.joinpath("logs")
 LOG_FILE_PATH = LOG_PATH.joinpath(
-    f"{APP_NAME_SNAKE_CASE}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    f"{APP_NAME_SNAKE_CASE}_{datetime.now().strftime("%d.%m.%Y")}.log"
 )
 
-REPORT_PATH = ROOT_PATH.joinpath("reports")
+REPORT_PATH = HOME_PATH.joinpath("reports")

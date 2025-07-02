@@ -1,9 +1,20 @@
+import re
+
 from rapidfuzz import fuzz
 
 
 async def is_substring(str1: str, str2: str) -> bool:
     """Checks if str1 is a substring of str2 or vice versa."""
     return str1 in str2 or str2 in str1
+
+
+async def cut_before_first_letter(host_name: str) -> str:
+    """If IP has letters, e.g. '244.29.238.44.in-addr.arpa' - cut until the first letter."""
+    match = re.search(r"[A-Za-z]", host_name)
+    if match:
+        return host_name[: match.start() - 1]
+
+    return host_name
 
 
 async def is_similar_vuln(

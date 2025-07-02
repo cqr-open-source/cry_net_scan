@@ -1,17 +1,14 @@
 import logging
-import sys
 from typing import Dict, Any
 
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.smb_enumerator.smb_enumeration_parser import parse_smb_enumeration
-from app.utils.subprocess_runner import subprocess_run
+from tools.smb_enumeration.run_smb_enumeration import run_smb_enumeration
 
 
 async def _run_single_smb_scan(
     host: Host,
-    # target_ip: str,
-    script_path: str,
     scanner_name: ScannerName,
 ) -> Dict[str, Any] | None:
     """
@@ -21,21 +18,11 @@ async def _run_single_smb_scan(
 
     target_ip = host.ip_address
 
+    result: str = run_smb_enumeration(target_ip)
+
     try:
-        # Call the generic subprocess_run utility
-        stdout_decoded = await subprocess_run(
-            command=[sys.executable, script_path, target_ip],
-            module_name=scanner_name,
-        )
-
-        if not stdout_decoded:  # subprocess_run returns empty string on error
-            logger.error(
-                f"{scanner_name} subprocess for {target_ip} returned empty output, indicating an error."
-            )
-            return
-
         await parse_smb_enumeration(
-            stdout_decoded=stdout_decoded,
+            temp_result=result,
             host=host,
             target_ip=target_ip,
             scanner_name=scanner_name,

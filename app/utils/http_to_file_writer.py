@@ -1,3 +1,4 @@
+import logging
 import pathlib
 from typing import List, Set
 from urllib.parse import urlparse
@@ -13,6 +14,8 @@ async def write_hosts_to_file(
     need_http: bool = False,
     need_ips: bool = False,
 ) -> None:
+    logger = logging.getLogger(__file__)
+
     urls: Set = set()
 
     for host in hosts:
@@ -43,5 +46,6 @@ async def write_hosts_to_file(
             urls.add(url)
 
     file.write_text("\n".join(urls), encoding="utf-8")
+    logger.debug(f"Hosts are written to the file: {file}")
 
     return None

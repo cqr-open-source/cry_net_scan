@@ -4,11 +4,11 @@ from typing import Optional, List, Set
 
 from app.models.host_config import Host
 from app.models.port_config import Port
-from app.models.raw_http_exchange_config import RawHttpExchange
 from app.models.scanner_config import ScannerName
 from app.models.vulnerability_config import Vulnerability
 from app.utils.host_getter import get_host
 from app.utils.jsonl_parser import parse_jsonl
+from app.utils.parsing_utils import cut_before_first_letter
 
 
 async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
@@ -37,7 +37,8 @@ async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
                 ip_required=True,
             )
         else:
-            host = result_item.get("host")
+            host = await cut_before_first_letter(host_name=result_item.get("host"))
+
             found_host: Optional[Host] = await get_host(
                 hosts=hosts,
                 data=host,
@@ -106,13 +107,6 @@ async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
                         else [classification_data["cwe-id"]]
                     )
 
-            raw_http_exchange: List = [
-                RawHttpExchange(
-                    request=result_item.get("request"),
-                    response=result_item.get("response"),
-                )
-            ]
-
             vulnerability = Vulnerability(
                 template_id=result_item["template-id"],
                 template_url=result_item.get("template-url"),
@@ -125,7 +119,6 @@ async def parse_nuclei(nuclei_result: str, hosts: list[Host]) -> None:
                 remediation=result_item["info"].get("remediation"),
                 type=result_item["type"],
                 extracted_results=result_item.get("extracted-results"),
-                raw_http_exchange=raw_http_exchange,
                 curl_command=result_item.get("curl-command"),
                 scanner_name=ScannerName.NUCLEI.value,
             )

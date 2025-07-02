@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import List, Literal
 import json
 import pathlib
@@ -15,8 +16,10 @@ async def save_data(
 ):
     logger = logging.getLogger(__name__)
 
-    # TODO: report_format, report_zip
+    # Check if the folder for logs exists
+    os.makedirs(report_base_dir, exist_ok=True)
 
+    # TODO: report_format, report_zip
     json_data = json.dumps([host.model_dump() for host in all_hosts])
     output_file = pathlib.Path(f"{report_base_dir}/{report_file}")
     output_file.write_text(json_data)

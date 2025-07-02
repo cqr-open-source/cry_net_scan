@@ -1,6 +1,7 @@
 import logging
+import os
 
-from app.core.paths import LOG_FILE_PATH
+from app.core.paths import LOG_FILE_PATH, LOG_PATH
 
 
 async def setup_logging(log_level: str = "INFO") -> logging.Logger:
@@ -26,6 +27,9 @@ async def setup_logging(log_level: str = "INFO") -> logging.Logger:
     console_handler.setLevel(log_level.upper())
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
+
+    # Check if the folder for logs exists
+    os.makedirs(LOG_PATH, exist_ok=True)
 
     # File Handler
     file_handler = logging.FileHandler(LOG_FILE_PATH)
