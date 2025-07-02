@@ -1,6 +1,10 @@
+import pathlib
 import sys
 
-from tools.smb_enumeration.run_smb_enumeration import run_smb_enumeration
+ROOT_PATH = pathlib.Path(__file__).parents[2].absolute()
+sys.path.append(str(ROOT_PATH))
+
+from tools.smb_enumeration.run_smb_enumeration import run_smb_enumeration  # noqa: E402
 
 
 def main():
