@@ -1,7 +1,9 @@
 import logging
+from typing import List
 
 from tools.auth.banner_grabber import grab_banner
 from tools.auth.constants import FINDINGS
+from tools.auth.finding_config import Finding
 from tools.auth.port_checker import check_port
 from tools.auth.service_identificator import identify_service_by_banner
 from tools.auth.service_validator import validate_service
@@ -9,7 +11,7 @@ from tools.auth.service_validator import validate_service
 
 def scan_host(ip, ports, services_filter=None, timeout=2, grab_banners=True):
     """Scan a single host focusing on unauthorized access."""
-    findings = []
+    findings: List[Finding | None] = []
 
     logging.info(f"Scanning {ip} for unauthorized access ({len(ports)} ports)...")
 
@@ -40,17 +42,20 @@ def scan_host(ip, ports, services_filter=None, timeout=2, grab_banners=True):
             for service_name in services_to_check:
                 if validate_service(ip, port, service_name, timeout):
                     details = FINDINGS[service_name]
-                    finding = {
-                        "Host": ip,
-                        "Service": service_name,
-                        "Port": port,
-                        "Severity": details["severity"],
-                        "Description": details["description"],
-                        "Remediation": details["remediation"],
-                        "CVE": details["cve"],
-                        "Banner": banner[:300] if banner else "",
-                        "Detection_Method": f"Banner: {identified_service}" if identified_service == service_name else "Port + Validation"
-                    }
+
+                    finding = Finding(
+                        host=ip,
+                        name=details["name"],
+                        service=service_name,
+                        port=port,
+                        severity=details["severity"],
+                        description=details["description"],
+                        remediation=details["remediation"],
+                        cve=details["cve"],
+                        banner=banner[:300] if banner else "",
+                        detection_method=f"Banner: {identified_service}" if identified_service == service_name else "Port + Validation",
+                    )
+
                     findings.append(finding)
                     logging.warning(f"UNAUTHORIZED ACCESS: {service_name} on {ip}:{port}")
                     break

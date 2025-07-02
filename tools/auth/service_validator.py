@@ -22,14 +22,14 @@ def validate_service(ip, port, service, timeout=2):
                 # Check if authentication is required
                 try:
                     search_r = requests.get(f"http://{ip}:{port}/_search", timeout=timeout)
-                    return search_r.status_code == 200  # No auth required
+                    return search_r.status_code == 200  # No auth_scan required
                 except requests.exceptions.RequestException:
                     return True  # Assume open if _search fails but initial connection works (e.g. security enabled but no data)
 
         elif service == "MongoDB":
             try:
                 client = pymongo.MongoClient(ip, port, serverSelectionTimeoutMS=timeout * 1000)
-                client.server_info()  # This will fail if auth is required
+                client.server_info()  # This will fail if auth_scan is required
                 return True
             except pymongo.errors.OperationFailure:
                 return False  # Auth required
@@ -39,7 +39,7 @@ def validate_service(ip, port, service, timeout=2):
         elif service == "Redis":
             try:
                 r = redis.Redis(host=ip, port=port, socket_timeout=timeout)
-                return r.ping()  # Will work if no auth required
+                return r.ping()  # Will work if no auth_scan required
             except redis.exceptions.ResponseError:
                 return False  # Auth required
             except Exception:
@@ -48,21 +48,21 @@ def validate_service(ip, port, service, timeout=2):
         elif service == "Memcached":
             try:
                 client = memcache_client.Client((ip, port), connect_timeout=timeout)
-                client.get("test")  # Will work if no auth
+                client.get("test")  # Will work if no auth_scan
                 return True
             except Exception:
                 return False
 
         elif service == "CouchDB":
             r = requests.get(f"http://{ip}:{port}/_all_dbs", timeout=timeout)
-            return r.status_code == 200  # Should require auth
+            return r.status_code == 200  # Should require auth_scan
 
         elif service == "InfluxDB":
             r = requests.get(f"http://{ip}:{port}/query?q=SHOW DATABASES", timeout=timeout)
             return r.status_code == 200
 
         elif service == "Cassandra":
-            # Try connecting without auth
+            # Try connecting without auth_scan
             try:
                 sock = socket.create_connection((ip, port), timeout=timeout)
                 sock.close()
@@ -78,7 +78,7 @@ def validate_service(ip, port, service, timeout=2):
                     r = requests.get(f"{protocol}://{ip}:{port}{path}", timeout=timeout, verify=False,
                                      allow_redirects=False)
 
-                    # Check for successful access without auth
+                    # Check for successful access without auth_scan
                     if r.status_code in [200, 301, 302]:
                         # Additional checks for specific services
                         if service == "Jenkins" and "jenkins" in r.text.lower():
@@ -86,7 +86,7 @@ def validate_service(ip, port, service, timeout=2):
                         elif service == "Grafana" and r.status_code == 200 and path == "/":
                             return "login" not in r.text.lower()
                         elif service == "RabbitMQ" and path == "/api/overview":
-                            return r.status_code == 200  # Should require auth
+                            return r.status_code == 200  # Should require auth_scan
                         elif service == "Git Repository" and path == "/.git/config":
                             return "[core]" in r.text or "repositoryformatversion" in r.text
                         elif service == "Directory Listing" and "Index of" in r.text:

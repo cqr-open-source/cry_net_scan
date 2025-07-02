@@ -1,8 +1,11 @@
 import logging
 from datetime import datetime
+from typing import List
+
+from tools.auth.finding_config import Finding
 
 
-def generate_report(findings, show_details=True) -> None:
+def generate_report(findings: List[Finding], show_details=True) -> None:
     """Generate a detailed unauthorized access report."""
     if not findings:
         logging.info("No unauthorized access vulnerabilities found!")
@@ -12,8 +15,8 @@ def generate_report(findings, show_details=True) -> None:
     unique_hosts = set()
 
     for finding in findings:
-        severity_counts[finding["Severity"]] += 1
-        unique_hosts.add(finding["Host"])
+        severity_counts[finding.severity] += 1
+        unique_hosts.add(finding.host)
 
     logging.info("UNAUTHORIZED ACCESS VULNERABILITY REPORT")
     logging.info(f"Scan completed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -28,7 +31,7 @@ def generate_report(findings, show_details=True) -> None:
         logging.info("Detailed findings by host:")
         host_findings = {}
         for finding in findings:
-            host = finding["Host"]
+            host = finding.host
             if host not in host_findings:
                 host_findings[host] = []
             host_findings[host].append(finding)
@@ -36,8 +39,8 @@ def generate_report(findings, show_details=True) -> None:
         for host, host_vulns in host_findings.items():
             logging.info(f"Host: {host}")
             for vuln in host_vulns:
-                cve_info = f"({vuln['CVE']})" if vuln['CVE'] else ""
-                logging.info(f"{vuln['Service']} (Port {vuln['Port']}) - {vuln['Severity']}{cve_info}")
-                logging.info(f"Description: {vuln['Description']}")
-                logging.info(f"Remediation: {vuln['Remediation']}")
-                logging.info(f"Detection: {vuln['Detection_Method']}")
+                cve_info = f"({vuln.cve})" if vuln.cve else ""
+                logging.info(f"{vuln.service} (Port {vuln.port}) - {vuln.severity}{cve_info}")
+                logging.info(f"Description: {vuln.description}")
+                logging.info(f"Remediation: {vuln.remediation}")
+                logging.info(f"Detection: {vuln.detection_method}")

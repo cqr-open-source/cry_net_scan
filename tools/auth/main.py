@@ -6,11 +6,15 @@ Focused on detecting services commonly exposed without proper authentication.
 
 import argparse
 import logging
+import pathlib
 import sys
 import time
 from typing import List
 
 import urllib3
+
+ROOT_PATH = pathlib.Path(__file__).parents[2].absolute()
+sys.path.append(str(ROOT_PATH))
 
 from tools.auth.args_parser import parse_args
 from tools.auth.ip_range_parser import parse_ip_range
@@ -59,8 +63,10 @@ def main():
 
     generate_report(results)
 
-    if args.output:
+    if args.output or args.format == "json":
         save_results(results, args.output, args.format)
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":
