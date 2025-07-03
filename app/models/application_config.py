@@ -25,7 +25,7 @@ class Application(BaseModel):
         description="List of IP addresses resolved for this application's domain/URL.",
     )
 
-    is_online: bool = Field(
+    is_alive: bool = Field(
         default=False, description="True if the application/service was reachable."
     )
 

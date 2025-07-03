@@ -5,22 +5,22 @@ from pydantic import BaseModel, Field
 from app.models.application_config import Application
 from app.models.port_config import Port
 from app.models.smb_enumeration_config import SmbEnumeration
-from app.models.target_type_config import TargetType
+from app.models.source_target_config import SourceTarget
 from app.models.technology_config import Technology
 from app.models.vulnerability_config import Vulnerability
 
 
 class Host(BaseModel):
     """
-    Represents a single host/asset discovered during the scanning process.
+    Represents a single IP discovered during the scanning process.
     This model will accumulate all information about the host throughout different scan phases.
     """
 
-    target: str = Field(..., description="Provided target.")
-    target_type: TargetType = Field(
-        default=TargetType.url.value,
-        description="Type of the target, e.g., 'url', 'domain', 'ip', etc.",
+    source_targets: List[SourceTarget] = Field(
+        default_factory=list,
+        description="List of original targets (IP, domain, URL) that resolved to this IP address.",
     )
+
     ip_address: str = Field(..., description="The IP address of the host.")
 
     is_alive: bool = Field(
@@ -81,4 +81,4 @@ class Host(BaseModel):
 
     # Need hash for set
     def __hash__(self):
-        return hash((self.target, self.ip_address))
+        return hash(self.ip_address)

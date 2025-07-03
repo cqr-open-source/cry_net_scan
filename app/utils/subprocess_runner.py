@@ -23,13 +23,7 @@ async def subprocess_run(
 
         stdout_bytes, stderr_bytes = await process.communicate()
 
-        stdout = stdout_bytes.decode("utf-8").strip()
-        stderr = stderr_bytes.decode("utf-8").strip()
-
-        if stderr:
-            logger.debug(f"{module_name} stderr: {stderr}")
-
-        return stdout
+        return stdout_bytes.decode("utf-8").strip()
 
     except Exception as e:
         logger.error(

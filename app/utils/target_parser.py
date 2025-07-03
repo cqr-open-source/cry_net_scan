@@ -29,10 +29,16 @@ async def parse_targets(raw_targets: List[str]) -> Tuple[List[Host], List[Applic
 
         # Check in specific order: IP Range, CIDR, URL/Domain, then Single IP as fallback
         if "-" in target and not target.startswith("http"):
-            await parse_ip_range(target=target, unique_hosts_by_ip=unique_hosts_by_ip)
+            await parse_ip_range(
+                target=target,
+                unique_hosts_by_ip=unique_hosts_by_ip,
+            )
 
         elif "/" in target and "//" not in target:
-            await parse_ip_cidr(target=target, unique_hosts_by_ip=unique_hosts_by_ip)
+            await parse_ip_cidr(
+                target=target,
+                unique_hosts_by_ip=unique_hosts_by_ip,
+            )
 
         elif " " not in target and (
             "." in target
@@ -48,7 +54,7 @@ async def parse_targets(raw_targets: List[str]) -> Tuple[List[Host], List[Applic
             # If none of the above, try to parse as a single IP
             await parse_single_ip(target=target, unique_hosts_by_ip=unique_hosts_by_ip)
 
-    logger.info(f"Total unique hosts processed: {len(unique_hosts_by_ip)}")
+    logger.info(f"Total unique IPs processed: {len(unique_hosts_by_ip)}")
     logger.info(
         f"Total unique applications processed: {len(unique_applications_by_url)}"
     )

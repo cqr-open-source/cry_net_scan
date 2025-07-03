@@ -32,3 +32,11 @@ class Port(BaseModel):
         default=None,
         description="Detailed SMB enumeration findings (shares, users, groups, policies, etc.).",
     )
+
+    def __hash__(self):
+        return hash(self.port)
+
+    def __eq__(self, other):
+        if not isinstance(other, Port):
+            return NotImplemented
+        return self.port == other.port

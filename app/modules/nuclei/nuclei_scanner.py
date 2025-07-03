@@ -6,15 +6,18 @@ from app.core.paths import NUCLEI_PATH
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.modules.nuclei.nuclei_parser import parse_nuclei
-from app.utils.http_to_file_writer import write_hosts_to_file
+from app.utils.hosts_to_file import write_hosts_to_file
 from app.utils.subprocess_runner import subprocess_run
 
 
 async def nuclei_scan(
     hosts: List[Host],
 ) -> None:
-    """Executes a vulnerability scan on the provided list of hosts using the Nuclei scanner.
-    Target: list of IPs with HTTP ports."""
+    """
+    Executes a vulnerability scan on the provided list of hosts using the Nuclei scanner.
+
+    Target: list of IPs with HTTP ports.
+    """
     # Get IPS with HTTP/HTTPS ports
     required_hosts: List[Host] = []
     for host in hosts:
@@ -24,6 +27,7 @@ async def nuclei_scan(
             break
 
     await write_hosts_to_file(
+        applications=[],
         hosts=required_hosts,
         file=NUCLEI_PATH,
         need_ports=True,

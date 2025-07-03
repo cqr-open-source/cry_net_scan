@@ -16,6 +16,8 @@ async def smb_enumeration_scan(
 
     It runs the smb_enum_module.py via subprocess, then parses and processes the JSON output.
     This function is asynchronous to allow for concurrent scanning.
+
+    Target: IP.
     """
 
     scan_tasks = []
@@ -29,6 +31,3 @@ async def smb_enumeration_scan(
 
     # Run all scan tasks concurrently and collect results
     await asyncio.gather(*scan_tasks)
-
-    # results = await asyncio.gather(*scan_tasks)
-    # all_smb_results = [res for res in results if res is not None]

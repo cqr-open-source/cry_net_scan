@@ -18,6 +18,7 @@ async def _run_single_smb_scan(
 
     target_ip = host.ip_address
 
+    logger.info(f"Running {scanner_name} for {target_ip}")
     result: str = run_smb_enumeration(target_ip)
 
     try:

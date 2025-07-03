@@ -6,7 +6,7 @@ from app.models.host_config import Host
 from app.models.port_config import Port
 from app.models.scanner_config import ScannerName
 from app.models.vulnerability_config import Vulnerability
-from app.utils.host_getter import get_host
+from app.utils.target_getter.host_getter import get_host
 from app.utils.jsonl_parser import parse_jsonl
 from app.utils.parsing_utils import cut_before_first_letter
 

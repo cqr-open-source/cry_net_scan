@@ -1,23 +1,28 @@
 import logging
-from typing import List
+from typing import List, Optional, Union
 
+from app.models.application_config import Application
 from app.models.host_config import Host
 from app.models.scanner_config import ScannerName
 from app.models.vulnerability_config import Vulnerability
 from app.modules.afrog.duplicate_finder import search_duplicate_vulnerabilities
-from app.utils.host_getter import get_host
+from app.utils.target_getter.target_getter import get_target
 
 
-async def parse_afrog(json_result: List, hosts: List[Host]) -> None:
+async def parse_afrog(
+    json_result: List,
+    hosts: List[Host],
+) -> None:
     logger = logging.getLogger(__name__)
 
     for vulnerability_info in json_result:
         target = vulnerability_info.get("target")
-        host: Host = await get_host(
+        received_target: Optional[Union[Application, Host]] = await get_target(
             hosts=hosts,
             data=target,
+            scanner_name=ScannerName.AFROG.value,
         )
-        if not host:
+        if not received_target:
             logger.warning(f"Host {target} not found in the provided hosts list.")
             continue
 
@@ -30,15 +35,12 @@ async def parse_afrog(json_result: List, hosts: List[Host]) -> None:
         )
 
         if await search_duplicate_vulnerabilities(
-            host=host,
+            host=received_target,
             vulnerability=vulnerability,
         ):
-            logger.debug(
-                f"Duplicate vulnerability {vulnerability.name} found on host {host.ip_address}. Skipping."
-            )
             continue
 
-        host.vulnerabilities.append(vulnerability)
+        received_target.vulnerabilities.append(vulnerability)
 
         logger.info(
             f"{target}: vulnerability '{vulnerability.name}' "

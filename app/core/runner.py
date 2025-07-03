@@ -18,8 +18,10 @@ from app.utils.chmod_adder import make_executable
 from app.utils.target_parser import parse_targets
 
 
-def get_live_hosts_only(all_hosts: List[Host]) -> List[Host]:
-    return [host for host in all_hosts if host.is_alive]
+def get_live_hosts_only(
+    targets: List[Host] | List[Application],
+) -> List[Host] | List[Application]:
+    return [host for host in targets if host.is_alive]
 
 
 async def run_tool(scan_config: ScanConfig) -> None:
@@ -30,7 +32,7 @@ async def run_tool(scan_config: ScanConfig) -> None:
         raw_targets=scan_config.target
     )
     all_hosts: List[Host] = result[0]
-    applications: List[Application] = result[1]  # noqa: F841
+    all_applications: List[Application] = result[1]  # noqa: F841
 
     if not all_hosts:
         logger.info("There are no VALID targets.")
@@ -52,8 +54,9 @@ async def run_tool(scan_config: ScanConfig) -> None:
         all_hosts=all_hosts,
     )
 
-    # Gather only live hosts
-    live_hosts: List[Host] = get_live_hosts_only(all_hosts=all_hosts)
+    # Gather only live hosts and live applications
+    live_hosts: List[Host] = get_live_hosts_only(targets=all_hosts)
+    live_applications: List[Application] = get_live_hosts_only(targets=all_applications)
 
     if not live_hosts:
         logger.info("There are no alive targets.")
@@ -62,6 +65,7 @@ async def run_tool(scan_config: ScanConfig) -> None:
     # Detect technologies
     await webanalyze_scan(
         hosts=live_hosts,
+        applications=live_applications,
     )
 
     # Manages unauthorized access scans.
@@ -84,13 +88,14 @@ async def run_tool(scan_config: ScanConfig) -> None:
     if not scan_config.disable_afrog:
         await afrog_scan(
             hosts=live_hosts,
+            applications=live_applications,
         )
 
-    # for host in live_hosts:
-    #     await rustscan_scan(host=host)
-
-    # TODO: continue...
-    # --- [END] TOOLS RUNNER [END] ---
+    # # for host in live_hosts:
+    # #     await rustscan_scan(host=host)
+    #
+    # # TODO: continue...
+    # # --- [END] TOOLS RUNNER [END] ---
 
     # Save the results to the specified format and location
     await save_data(

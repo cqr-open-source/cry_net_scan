@@ -4,6 +4,7 @@ from typing import Dict
 
 from app.models.host_config import Host
 from app.models.target_type_config import TargetType
+from app.utils.args_parser.host_source_appender import add_host_and_source_target
 
 
 async def parse_ip_range(
@@ -27,13 +28,13 @@ async def parse_ip_range(
         current_ip = start_ip
         while current_ip <= end_ip:
             ip_str = str(current_ip)
-            if ip_str not in unique_hosts_by_ip:
-                unique_hosts_by_ip[ip_str] = Host(
-                    target=target,
-                    target_type=TargetType.ip_range.value,
-                    ip_address=ip_str,
-                )
-                logger.debug(f"Added host from range '{target}': {ip_str}")
+            await add_host_and_source_target(
+                unique_hosts_by_ip=unique_hosts_by_ip,
+                ip=ip_str,
+                original_target_value=target,
+                original_target_type=TargetType.ip_range,
+            )
+            logger.debug(f"Added host from range '{target}': {ip_str}")
 
             current_ip = ipaddress.ip_address(int(current_ip) + 1)
         logger.info(f"Processed IP range '{target}'.")

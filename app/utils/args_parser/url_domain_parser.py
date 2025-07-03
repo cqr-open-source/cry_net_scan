@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from app.models.application_config import Application
 from app.models.host_config import Host
 from app.models.target_type_config import TargetType
+from app.utils.args_parser.host_source_appender import add_host_and_source_target
 from app.utils.args_parser.ip_single_parser import parse_single_ip
 
 
@@ -16,6 +17,8 @@ async def get_all_ips(domain: str) -> List[str]:
     Gets all unique IP addresses for a given domain,
     executing the blocking operation in a separate thread.
     """
+    logger = logging.getLogger(__name__)
+
     ips = set()
     try:
         results = await asyncio.to_thread(socket.getaddrinfo, domain, None)
@@ -23,9 +26,10 @@ async def get_all_ips(domain: str) -> List[str]:
             # res[4] - is the address info tuple, res[4][0] - is the IP address itself
             ips.add(res[4][0])
     except socket.gaierror as e:
-        logging.warning(f"Could not resolve domain '{domain}': {e}")
+
+        logger.warning(f"Could not resolve domain '{domain}': {e}")
     except Exception as e:
-        logging.error(f"Error getting IPs for domain '{domain}': {e}")
+        logger.error(f"Error getting IPs for domain '{domain}': {e}")
     return list(ips)
 
 
@@ -35,16 +39,24 @@ async def parse_url_domain(
     unique_applications_by_url: Dict[str, Application],
 ) -> None:
     logger = logging.getLogger(__name__)
+    original_target = target
 
     try:
         # Pre-pend 'http://' if no scheme is present to ensure urlparse correctly identifies the hostname.
-        # Store the original string to check for scheme later for target_type.
-        original_target = target
+        # Store the original string to check for a scheme later for target_type.
         if "://" not in target:
             target = f"http://{target}"
 
         parsed = urlparse(target)
         hostname = parsed.hostname
+
+        # Determine the target type for the SourceTarget (domain or url)
+        source_target_type: TargetType
+        if parsed.scheme and parsed.scheme in ["http", "https"]:
+            source_target_type = TargetType.url
+        else:  # Fallback to domain if no explicit scheme or unsupported scheme
+            source_target_type = TargetType.domain
+
         scheme = parsed.scheme  # noqa: F841
 
         # Determine if the extracted hostname is an IP address
@@ -63,7 +75,8 @@ async def parse_url_domain(
             # Ensure a Host object is created for this IP.
             # This covers cases like http://192.168.1.1 or https://[::1]/
             await parse_single_ip(
-                target=hostname, unique_hosts_by_ip=unique_hosts_by_ip
+                target=hostname,
+                unique_hosts_by_ip=unique_hosts_by_ip,
             )
             return
 
@@ -77,13 +90,6 @@ async def parse_url_domain(
         # Resolve IPs for the valid hostname
         resolved_ips_for_domain = await get_all_ips(hostname)
 
-        # Determine a target type for the Application based on the ORIGINAL target
-        app_target_type: TargetType
-        if "://" in original_target:  # Check the original string for a scheme
-            app_target_type = TargetType.url
-        else:
-            app_target_type = TargetType.domain
-
         # Normalize URL/domain for the unique key in unique_applications_by_url
         # If original_target had a scheme, use its canonical form (rstrip('/')).
         # Otherwise, use just the hostname (which is the domain itself).
@@ -91,15 +97,17 @@ async def parse_url_domain(
             original_target.rstrip("/") if "://" in original_target else hostname
         )
 
+        app_obj: Application
         if canonical_url not in unique_applications_by_url:
             app_obj = Application(
                 target=canonical_url,
-                target_type=app_target_type.value,
+                target_type=source_target_type.value,
                 resolved_ips=list(set(resolved_ips_for_domain)),
+                is_alive=True if resolved_ips_for_domain else False,
             )
             unique_applications_by_url[canonical_url] = app_obj
-            logger.info(
-                f"Added application '{canonical_url}' (type: {app_target_type.value}) "
+            logger.debug(
+                f"Added application '{canonical_url}' (type: {source_target_type.value}) "
                 f"with resolved IP(s): {', '.join(resolved_ips_for_domain) if resolved_ips_for_domain else 'None'}"
             )
         else:
@@ -117,23 +125,19 @@ async def parse_url_domain(
         # For each resolved IP, create or update a Host object
         if resolved_ips_for_domain:
             for ip_addr in resolved_ips_for_domain:
-                if ip_addr not in unique_hosts_by_ip:
-                    # Host target_type reflects the original input type
-                    host_original_target_type = (
-                        TargetType.url.value
-                        if "://" in original_target
-                        else TargetType.domain.value
-                    )
+                await add_host_and_source_target(
+                    unique_hosts_by_ip=unique_hosts_by_ip,
+                    ip=ip_addr,
+                    original_target_value=original_target,
+                    original_target_type=source_target_type,
+                )
 
-                    unique_hosts_by_ip[ip_addr] = Host(
-                        target=original_target,  # Store the original input string
-                        target_type=host_original_target_type,
-                        ip_address=ip_addr,
-                        associated_applications=[app_obj],
-                    )
+                host_obj = unique_hosts_by_ip[ip_addr]
+
+                if app_obj not in host_obj.associated_applications:
+                    host_obj.associated_applications.append(app_obj)
                     logger.debug(
-                        f"Added host for original target '{original_target}' "
-                        f"with resolved IP: {ip_addr}"
+                        f"Associated application '{app_obj.target}' with host {ip_addr}"
                     )
 
     except socket.gaierror as e:

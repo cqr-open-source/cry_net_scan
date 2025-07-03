@@ -1,23 +1,31 @@
+import logging
+from typing import Optional
+
 from app.models.host_config import Host
 from app.models.vulnerability_config import Vulnerability
 from app.utils.parsing_utils import is_substring, is_similar_vuln
 
 
 async def search_duplicate_vulnerabilities(
-    host: Host, vulnerability: Vulnerability
+    host: Host,
+    vulnerability: Vulnerability,
 ) -> bool:
     """
     Search for duplicate vulnerabilities on any port for a given host.
     Returns True if a duplicate is found, otherwise False.
     """
+    logger = logging.getLogger(__name__)
+
+    result: Optional[bool] = None
+
     for port_info in host.ports:
         for port_vulnerability in port_info.vulnerabilities:
             if vulnerability.cve and port_vulnerability.cve:
-                return True if vulnerability.cve == port_vulnerability.cve else False
+                result = True if vulnerability.cve == port_vulnerability.cve else False
             elif vulnerability.cwe and port_vulnerability.cwe:
-                return True if vulnerability.cwe == port_vulnerability.cwe else False
+                result = True if vulnerability.cwe == port_vulnerability.cwe else False
             elif vulnerability.finding_url and port_vulnerability.finding_url:
-                return (
+                result = (
                     True
                     if vulnerability.finding_url == port_vulnerability.finding_url
                     else False
@@ -27,7 +35,7 @@ async def search_duplicate_vulnerabilities(
                     str1=port_vulnerability.name,
                     str2=vulnerability.name,
                 ):
-                    return True
+                    result = True
 
                 # A last chance to check similarity
                 if await is_similar_vuln(
@@ -36,6 +44,12 @@ async def search_duplicate_vulnerabilities(
                     template_id_1=vulnerability.template_id,
                     template_id_2=port_vulnerability.template_id,
                 ):
-                    return True
+                    result = True
 
-    return False
+    if not result:
+        return False
+
+    if result:
+        logger.debug(f"Duplicate vulnerability found: {vulnerability.name}")
+
+    return result

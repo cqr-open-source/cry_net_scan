@@ -80,5 +80,4 @@ async def parse_smb_enumeration(
         else:
             host.smb_enumeration_data = results
 
-    logger.info(f"Successfully completed {scanner_name} for {target_ip}.")
     return None

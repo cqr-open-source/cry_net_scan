@@ -16,6 +16,8 @@ async def auth_scan(
     and then runs all these tasks concurrently. Each scan is performed
     by the `_run_single_auth_scan` function, which is responsible for executing
     the actual unauthorized access.
+
+    Target: IP.
     """
     scan_tasks = []
     for host in hosts:
