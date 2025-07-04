@@ -17,3 +17,6 @@ redis==6.2.0
 pymongo==4.13.2
 pymemcache==4.0.0
 urllib3==2.5.0
+
+# AI
+openai==1.93.0

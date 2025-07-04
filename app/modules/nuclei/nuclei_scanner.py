@@ -1,3 +1,4 @@
+import logging
 import pathlib
 from typing import List
 
@@ -18,6 +19,8 @@ async def nuclei_scan(
 
     Target: list of IPs with HTTP ports.
     """
+    logger = logging.getLogger(__name__)
+
     # Get IPS with HTTP/HTTPS ports
     required_hosts: List[Host] = []
     for host in hosts:
@@ -25,6 +28,10 @@ async def nuclei_scan(
             if port.service in ("http", "https"):
                 required_hosts.append(host)
             break
+
+    if not required_hosts:
+        logger.debug(f"Skipping {ScannerName.NUCLEI.value} - no hosts to scan")
+        return None
 
     await write_hosts_to_file(
         applications=[],
@@ -52,6 +59,8 @@ async def nuclei_scan(
         "-l",
         str(NUCLEI_PATH),
         "-jsonl",
+        "-timeout",
+        "5",
     ]
 
     result: str = await subprocess_run(
